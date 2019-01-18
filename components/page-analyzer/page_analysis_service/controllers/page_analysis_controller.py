@@ -1,8 +1,13 @@
 import json
 from http import HTTPStatus
 
-from Services.PageAnalysisService import PageAnalysisService
+import bottle
 from bottle import request
+
+from page_analysis_service.services.page_analysis_service import PageAnalysisService
+from page_analysis_service.utils.log import get_logger
+
+LOGGER = get_logger('page_analysis_controller')
 
 
 class PageAnalysisController:
@@ -21,16 +26,18 @@ class PageAnalysisController:
 
     def page_analysis(self):
         results = {}
-        status = "OK"
-        status_code = HTTPStatus.OK
 
         concrete_state = json.load(request.body)
 
         analysis = self._service.get_page_analysis(concrete_state)
 
+        LOGGER.info('Analysis completed...')
+
         results["analysis"] = analysis
 
-        return results, status, status_code
+        LOGGER.info('Results built...')
+
+        return bottle.HTTPResponse(body=results, status=200)
 
     def get_page_titles(self):
         results = {}

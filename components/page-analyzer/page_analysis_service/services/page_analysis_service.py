@@ -1,14 +1,19 @@
-import pickle
 import pandas as pd
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-from Services.ConcreteStateFeaturize import ConcreteStateFeaturize
-from Services.ConfusionMatrix import print_cm
-from Services.FrameMapper import FrameMapper
+from page_analysis_service.services.concrete_state_featurizer import ConcreteStateFeaturize
+from page_analysis_service.services.confusion_matrix import print_cm
+from page_analysis_service.services.frame_mapper import FrameMapper
+from page_analysis_service.utils.log import get_logger
+from page_analysis_service.utils.pickler import ReadWritePickles
 
 RUN_LIVE = True
+BASE_PATH = 'page_analysis_service/data'
+LOGGER = get_logger('page_analysis_service')
+PICKLER = ReadWritePickles()
+PICKLER.base_path = BASE_PATH
 
 
 class PageAnalysisService:
@@ -58,63 +63,41 @@ class PageAnalysisService:
             },
         }
 
-        self.__label_classifier_df = pd.read_csv('label_candidates_sys.csv')
+        self.__label_classifier_df = pd.read_csv(f'{BASE_PATH}/label_candidates_sys.csv')
         self.__label_classifier_df.replace(self.feature_mapping, inplace=True)
         self.__label_classifier_df_orig = self.__label_classifier_df.copy(deep=True)
 
-        self.__error_msg_classifier_df = pd.read_csv('error_messages_sys.csv')
+        self.__error_msg_classifier_df = pd.read_csv(f'{BASE_PATH}/error_messages_sys.csv')
         self.__error_msg_classifier_df.replace(self.feature_mapping, inplace=True)
         self.__error_msg_classifier_df_orig = self.__error_msg_classifier_df.copy(deep=True)
 
-        self.__commit_classifier_df = pd.read_csv('commits_sys.csv')
+        self.__commit_classifier_df = pd.read_csv(f'{BASE_PATH}/commits_sys.csv')
         self.__commit_classifier_df.replace(self.feature_mapping, inplace=True)
         self.__commit_classifier_df_orig = self.__commit_classifier_df.copy(deep=True)
 
         # Load system-delivered classifiers.
 
-        with open('label_candidates.clf', 'rb') as file:
-            s = file.read()
+        self.__label_classifier = PICKLER.read('label_candidates.clf')
 
-        self.__label_classifier = pickle.loads(s)
+        self.__error_msg_classifier = PICKLER.read('error_messages.clf')
 
-        with open('error_messages.clf', 'rb') as file:
-            s = file.read()
+        self.__commit_classifier = PICKLER.read('commits.clf')
 
-        self.__error_msg_classifier = pickle.loads(s)
-
-        with open('commits.clf', 'rb') as file:
-            s = file.read()
-
-        self.__commit_classifier = pickle.loads(s)
-
-        with open('page_titles.clf', 'rb') as file:
-            s = file.read()
-
-        self.__page_title_classifier = pickle.loads(s)
+        self.__page_title_classifier = PICKLER.read('page_titles.clf')
 
         # Load live, trainable classifiers.
 
-        with open('label_candidates_live.clf', 'rb') as file:
-            s = file.read()
+        self.__label_classifier_live = PICKLER.read('label_candidates_live.clf')
 
-        self.__label_classifier_live = pickle.loads(s)
+        self.__error_msg_classifier_live = PICKLER.read('error_messages_live.clf')
 
-        with open('error_messages_live.clf', 'rb') as file:
-            s = file.read()
-
-        self.__error_msg_classifier_live = pickle.loads(s)
-
-        with open('commits_live.clf', 'rb') as file:
-            s = file.read()
-
-        self.__commit_classifier_live = pickle.loads(s)
+        self.__commit_classifier_live = PICKLER.read('commits_live.clf')
 
         if RUN_LIVE:
             self.__label_classifier = self.__label_classifier_live
             self.__error_msg_classifier = self.__error_msg_classifier_live
             self.__commit_classifier = self.__commit_classifier_live
 
-        pass
 
     def get_page_titles(self, concrete_state):
         data = {
@@ -144,9 +127,13 @@ class PageAnalysisService:
             "cancels": []
         }
 
+        LOGGER.info('Setting up dataframes')
+
         df = self.__featurize.convert_to_feature_frame(concrete_state)
         df_first = self.__frame_mapper.map_label_candidates(df)
         df_sec = self.__frame_mapper.map_page_titles(df)
+
+        LOGGER.info('Processing first')
 
         for data_point in df_first.values:
             widget_key = data_point[0]
@@ -155,12 +142,16 @@ class PageAnalysisService:
             data_point = data_point[1:].reshape(1, -1)
             pred = self.__label_classifier.predict(data_point)
             if pred[0] == 1 and widget_key not in self.negativeStorage["labelCandidates"]:
-                print(self.storage)
+                LOGGER.debug(self.storage)
                 data["labelCandidates"].append(widget_key)
+
+        LOGGER.info('Label candidates')
 
         for labelCandidate in self.storage["labelCandidates"]:
             if labelCandidate not in data["labelCandidates"]:
                 data["labelCandidates"].append(labelCandidate)
+
+        LOGGER.info('Reprocessing first')
 
         for data_point in df_first.values:
             widget_key = data_point[0]
@@ -178,9 +169,13 @@ class PageAnalysisService:
                     self.negativeStorage["errorMessages"]:
                 data["commits"].append(widget_key)
 
+        LOGGER.info('Checking error messages')
+
         for errorMessage in self.storage["errorMessages"]:
             if errorMessage not in data["errorMessages"]:
                 data["errorMessages"].append(errorMessage)
+
+        LOGGER.info('THIRD PROCESSING')
 
         for data_point in df_sec.values:
             widget_key = data_point[0]
@@ -191,9 +186,13 @@ class PageAnalysisService:
             if pred[0] == 1 and widget_key not in self.negativeStorage["pageTitles"]:
                 data["pageTitles"].append(widget_key)
 
+        LOGGER.info('Processing Titles ')
+
         for pageTitle in self.storage["pageTitles"]:
             if pageTitle not in data["pageTitles"]:
                 data["pageTitles"].append(pageTitle)
+
+        LOGGER.info('Returning data')
 
         return data
 
@@ -235,28 +234,19 @@ class PageAnalysisService:
             self.__error_msg_classifier = clf
             self.__error_msg_classifier_df = df_in_use
 
-            s = pickle.dumps(clf)
-
-            with open('error_messages_live.clf', 'wb') as file:
-                file.write(s)
+            PICKLER.write('error_messages_live.clf', clf)
 
         elif element_class == 'labelCandidate':
             self.__label_classifier = clf
             self.__label_classifier_df = df_in_use
 
-            s = pickle.dumps(clf)
-
-            with open('label_candidates_live.clf', 'wb') as file:
-                file.write(s)
+            PICKLER.write('label_candidates_live.clf', clf)
 
         elif element_class == 'commit':
             self.__commit_classifier = clf
             self.__commit_classifier_df = df_in_use
 
-            s = pickle.dumps(clf)
-
-            with open('commits_live.clf', 'wb') as file:
-                file.write(s)
+            PICKLER.write('commits_live.clf', clf)
 
         train_pred_y = clf.predict(df_in_use[features])
 
@@ -272,17 +262,17 @@ class PageAnalysisService:
             small_train_true_y.append(train_true_y[i])
             small_train_pred_y.append(train_pred_y[i])
 
-        print("")
-        print("Metrics (vs. training set)")
-        print("Accuracy (all): " + str(accuracy_score(train_true_y, train_pred_y)))
-        print("Accuracy (excluding Nones): " + str(accuracy_score(small_train_true_y, small_train_pred_y)))
-        print("")
-        print(classification_report(train_true_y, train_pred_y, target_names=target_names))
+        LOGGER.info("")
+        LOGGER.info("Metrics (vs. training set)")
+        LOGGER.info("Accuracy (all): " + str(accuracy_score(train_true_y, train_pred_y)))
+        LOGGER.info("Accuracy (excluding Nones): " + str(accuracy_score(small_train_true_y, small_train_pred_y)))
+        LOGGER.info("")
+        LOGGER.info(classification_report(train_true_y, train_pred_y, target_names=target_names))
 
         train_true_y = [target_names[j] for j in train_true_y]
         train_pred_y = [target_names[j] for j in train_pred_y]
         cm = confusion_matrix(train_true_y, train_pred_y, labels=target_names)
         print_cm(cm, target_names)
 
-        print("Done training")
-        print(self.storage)
+        LOGGER.info("Done training")
+        LOGGER.info(self.storage)

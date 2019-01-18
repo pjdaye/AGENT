@@ -1,11 +1,15 @@
 import math
 import re
+
 import numpy as np
 import pandas as pd
-
 from colormath.color_conversions import convert_color
 from colormath.color_diff import delta_e_cie2000
 from colormath.color_objects import sRGBColor, LabColor
+
+from page_analysis_service.utils.log import get_logger
+
+LOGGER = get_logger('concrete_state_featurizer')
 
 color_re = re.compile("(rgb|rgba)\(([0-9]+?), ([0-9]+?), ([0-9]+?)([,)])")
 
@@ -87,8 +91,8 @@ def normalize(df, excludes):
                 min_value = 0
             result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
             result[feature_name] = result[feature_name].apply(lambda x: round(abs(x), 4))
-        except Exception:
-            print("Error normalizing feature: {}".format(feature_name))
+        except:
+            LOGGER.error(f'Error normalizing feature: {feature_name}')
             raise
     return result
 
@@ -170,7 +174,7 @@ class ConcreteStateFeaturize:
 
             text = widget['properties']['text']
 
-            print(key, text)
+            LOGGER.debug(f'convert_feature_to_frame, {key}, {text}')
             text = text.strip()
             text = text.replace('\"', "")
             is_text = text != ""
@@ -182,8 +186,8 @@ class ConcreteStateFeaturize:
                 nearest_color = get_nearest_color(color)
                 nearest_bg_color = get_nearest_color(bg_color)
             else:
-                nearest_color = base_colors[0][0]
-                nearest_bg_color = base_colors[0][0]
+                nearest_color = base_colors[0][1]
+                nearest_bg_color = base_colors[0][1]
 
             # This is affected by zoom level.
             distance_from_input_widget = 9999
@@ -238,6 +242,6 @@ class ConcreteStateFeaturize:
                                    'Nearest_Color', 'Nearest_Bg_Color', 'Distance_From_Input', 'Text'])
 
         # Normalize.
-        df = normalize(df, ['Key', 'Tag', 'Parent_Tag', 'Attr_For', 'Is_Text', 'Text', 'Class'])
+        df = normalize(df, ['Key', 'Tag', 'Parent_Tag', 'Attr_For', 'Is_Text', 'Text', 'Class', 'Nearest_Color', 'Nearest_Bg_Color'])
 
         return df
