@@ -186,8 +186,8 @@ class ConcreteStateFeaturize:
                 nearest_color = get_nearest_color(color)
                 nearest_bg_color = get_nearest_color(bg_color)
             else:
-                nearest_color = base_colors[0][1]
-                nearest_bg_color = base_colors[0][1]
+                nearest_color = base_colors[0][0]
+                nearest_bg_color = base_colors[0][0]
 
             # This is affected by zoom level.
             distance_from_input_widget = 9999

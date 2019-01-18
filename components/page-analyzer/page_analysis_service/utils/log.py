@@ -2,7 +2,7 @@
 import logging
 import os
 
-DEFAULT_LEVEL = logging.INFO
+DEFAULT_LEVEL = logging.WARN
 ENV_VAR = 'LOGGING_LEVEL'
 
 
