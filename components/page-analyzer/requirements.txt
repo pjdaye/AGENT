@@ -1,0 +1,6 @@
+celery==4.2.1
+jsonpickle==1.0
+redis==3.0.1
+gunicorn==19.9.0
+colormath==3.0.0
+bottle==0.12.16

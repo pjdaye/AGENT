@@ -1,0 +1,1 @@
+name = "aist-common"

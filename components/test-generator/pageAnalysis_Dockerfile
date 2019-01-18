@@ -1,0 +1,44 @@
+FROM pterodactyl.python3
+ARG container_host
+ARG mongo_host
+ARG rabbit_host
+ENV ch $container_host
+ENV mh $mongo_host
+ENV rh $rabbit_host
+
+RUN pip install gunicorn
+RUN pip install numpy
+RUN pip install scikit-learn
+RUN pip install scipy
+RUN pip install colormath
+RUN pip install pandas
+RUN pip install tensorflow
+RUN pip install h5py
+RUN pip install keras
+
+COPY ./app /app
+COPY core_nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/conf.d/
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+USER root
+
+ADD rsyslog.conf /etc/rsyslog.conf
+RUN update-rc.d rsyslog defaults
+
+RUN bash -c "touch /app/*"
+
+ENV PORT 9007
+ENV PATH /bin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+ENV PYTHONPATH /app:/usr/lib/python3.5/site-packages/:/usr/local/lib/python3.5/site-packages/:/app/pterodactyl_lib-0.4-py3.5.egg:/app/pterodactyl_pagecomprehension_lib-0.4-py3.5.egg:/app/PageAnalysisService
+ENV SERVICE_HOST $ch
+ENV SERVICE_PORT 9007
+ENV EUREKA_HOST $ch
+ENV MONGO_HOST $mh:27017
+ENV CHECKPOINT_TTL 604800
+
+CMD export uri="\$uri" \
+    && envsubst < /etc/nginx/conf.d/nginx.conf > subst_ \
+    && cat subst_ \
+    && cp subst_ /etc/nginx/conf.d/nginx.conf \
+    && /usr/bin/supervisord

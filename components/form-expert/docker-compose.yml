@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  formexpert:
+    build: ./
+    ports:
+      - "8080:80"
+    environment:
+      - FORM_EXPERT_MONGO_HOST=mongodb://localhost:27017
+      
+  mongo:
+    image: 'mongo'
+    ports:
+      - "27017:27017"
+    volumes:
+      - data/form-expert
