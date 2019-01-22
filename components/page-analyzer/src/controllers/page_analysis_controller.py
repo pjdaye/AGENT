@@ -4,8 +4,8 @@ from http import HTTPStatus
 import bottle
 from bottle import request
 
-from page_analysis_service.services.page_analysis_service import PageAnalysisService
-from page_analysis_service.utils.log import get_logger
+from services.page_analysis_service import PageAnalysisService
+from utils.log import get_logger
 
 LOGGER = get_logger('page_analysis_controller')
 
@@ -21,8 +21,9 @@ class PageAnalysisController:
         self._app.route('/v1/pageTitleAnalysis/state/concrete', method="POST", callback=self.get_page_titles)
         self._app.route('/v1/pageAnalysis/state/add', method="POST", callback=self.add)
 
-    def get_status(self):
-        return json.dumps({'status': 'OK'})
+    @staticmethod
+    def get_status():
+        return bottle.HTTPResponse(body={'status': 'OK'}, status=200)
 
     def page_analysis(self):
         results = {}

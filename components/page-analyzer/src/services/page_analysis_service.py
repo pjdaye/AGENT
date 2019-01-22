@@ -3,14 +3,14 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-from page_analysis_service.services.concrete_state_featurizer import ConcreteStateFeaturize
-from page_analysis_service.services.confusion_matrix import print_cm
-from page_analysis_service.services.frame_mapper import FrameMapper
-from page_analysis_service.utils.log import get_logger
-from page_analysis_service.utils.pickler import ReadWritePickles
+from services.concrete_state_featurizer import ConcreteStateFeaturize
+from services.confusion_matrix import print_cm
+from services.frame_mapper import FrameMapper
+from utils.log import get_logger
+from utils.pickler import ReadWritePickles
 
 RUN_LIVE = True
-BASE_PATH = 'page_analysis_service/data'
+BASE_PATH = 'data'
 LOGGER = get_logger('page_analysis_service')
 PICKLER = ReadWritePickles()
 PICKLER.base_path = BASE_PATH
@@ -97,7 +97,6 @@ class PageAnalysisService:
             self.__label_classifier = self.__label_classifier_live
             self.__error_msg_classifier = self.__error_msg_classifier_live
             self.__commit_classifier = self.__commit_classifier_live
-
 
     def get_page_titles(self, concrete_state):
         data = {

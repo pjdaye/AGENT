@@ -7,11 +7,11 @@ from colormath.color_conversions import convert_color
 from colormath.color_diff import delta_e_cie2000
 from colormath.color_objects import sRGBColor, LabColor
 
-from page_analysis_service.utils.log import get_logger
+from utils.log import get_logger
 
 LOGGER = get_logger('concrete_state_featurizer')
 
-color_re = re.compile("(rgb|rgba)\(([0-9]+?), ([0-9]+?), ([0-9]+?)([,)])")
+color_re = re.compile(r'(rgb|rgba)\(([0-9]+?), ([0-9]+?), ([0-9]+?)([,)])')
 
 base_colors = [
     ('black', np.array([0, 0, 0])),
@@ -242,6 +242,7 @@ class ConcreteStateFeaturize:
                                    'Nearest_Color', 'Nearest_Bg_Color', 'Distance_From_Input', 'Text'])
 
         # Normalize.
-        df = normalize(df, ['Key', 'Tag', 'Parent_Tag', 'Attr_For', 'Is_Text', 'Text', 'Class', 'Nearest_Color', 'Nearest_Bg_Color'])
+        df = normalize(df, ['Key', 'Tag', 'Parent_Tag', 'Attr_For', 'Is_Text', 'Text', 'Class', 'Nearest_Color',
+                            'Nearest_Bg_Color'])
 
         return df

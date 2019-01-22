@@ -6,7 +6,7 @@ DEFAULT_LEVEL = logging.WARN
 ENV_VAR = 'LOGGING_LEVEL'
 
 
-def get_logger(class_name):
+def get_logger(class_name) -> logging.Logger:
     """Gets a class's logger and sets logging level
 
     The logging level is determined by the environment variable 'LOGGING_LEVEL'
