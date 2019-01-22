@@ -14,10 +14,6 @@ RUN apk add --no-cache bash
 
 ADD $app_dir/supervisord.conf /etc/
 
-COPY common/dist/aist_common-0.0.1-py3-none-any.whl /app
-
-RUN pip install aist_common-0.0.1-py3-none-any.whl
-
 ENV PATH /bin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/sbin
 
 RUN apk add --no-cache \
@@ -66,3 +62,7 @@ RUN cd /tmp && \
     \
     apk del .build-dependencies && \
     rm -rf /tmp/*
+
+COPY common/dist/aist_common-0.0.1-py3-none-any.whl /app
+
+RUN pip install aist_common-0.0.1-py3-none-any.whl
