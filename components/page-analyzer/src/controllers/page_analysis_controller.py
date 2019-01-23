@@ -43,8 +43,6 @@ class PageAnalysisController:
 
     def get_page_titles(self):
         results = {}
-        status = "OK"
-        status_code = HTTPStatus.OK
 
         concrete_state = json.load(request.body)
 
@@ -52,15 +50,13 @@ class PageAnalysisController:
 
         results["analysis"] = analysis
 
-        return results, status, status_code
+        return bottle.HTTPResponse(body=results, status=200)
 
     def add(self):
         results = {}
-        status = "OK"
-        status_code = HTTPStatus.OK
 
         element = json.load(request.body)
 
         self._service.add_element(element)
 
-        return results, status, status_code
+        return bottle.HTTPResponse(body=results, status=200)
