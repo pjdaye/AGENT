@@ -6,8 +6,9 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 from services.concrete_state_featurizer import ConcreteStateFeaturize
 from services.confusion_matrix import print_cm
 from services.frame_mapper import FrameMapper
-from utils.log import get_logger
-from utils.pickler import ReadWritePickles
+
+from aist_common.log import get_logger
+from aist_common.pickler import ReadWritePickles
 
 RUN_LIVE = True
 BASE_PATH = 'data'

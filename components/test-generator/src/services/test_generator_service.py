@@ -12,11 +12,9 @@ import tensorflow as tf
 from keras.models import load_model
 
 
-class TestSequenceService:
-    def __init__(self, acl):
-        self.__acl = acl
-
-        with open('embedding.json') as f:
+class TestGeneratorService:
+    def __init__(self):
+        with open('data/embedding.json') as f:
             data = json.load(f)
             self.char_indices = data['char_indices']
             self.indices_char = data['indices_char']
@@ -24,11 +22,14 @@ class TestSequenceService:
         self.maxlen = 11
         self.chars = self.char_indices.values()
 
-        self.model = load_model('lstm.h5')
+        self.model = load_model('data/lstm.h5')
+
+        # noinspection PyProtectedMember
         self.model._make_predict_function()
+
         self.graph = tf.get_default_graph()
 
-    def predict(self, context, query, num_to_predict):
+    def predict(self, query, num_to_predict):
         output = []
 
         for i in range(num_to_predict):
@@ -45,7 +46,6 @@ class TestSequenceService:
                     x_pred = np.zeros((1, self.maxlen, len(self.chars)))
                     for t, char in enumerate(query):
                         x_pred[0, t, self.char_indices[char]] = 1.
-                        print("vector[0, {}, {}] = 1".format(t, self.char_indices[char]))
 
                     preds = self.model.predict(x_pred, verbose=0)[0]
 

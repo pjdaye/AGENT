@@ -1,0 +1,12 @@
+celery==4.2.1
+jsonpickle==1.0
+redis==3.0.1
+gunicorn==19.9.0
+colormath==3.0.0
+bottle==0.12.16
+h5py==2.9.0
+Keras==2.2.4
+Keras-Applications==1.0.6
+Keras-Preprocessing==1.0.5
+tensorboard==1.12.2
+tensorflow==1.12.0

@@ -7,7 +7,7 @@ from colormath.color_conversions import convert_color
 from colormath.color_diff import delta_e_cie2000
 from colormath.color_objects import sRGBColor, LabColor
 
-from utils.log import get_logger
+from aist_common.log import get_logger
 
 LOGGER = get_logger('concrete_state_featurizer')
 
