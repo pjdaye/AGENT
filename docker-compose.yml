@@ -1,47 +1,88 @@
-version: '2'
+version: '2.1'
 services:
-#  coordinator-agent:
-#    build: ./components/coordinator-agent
-#    environment:
-#      - REDIS_HOST=redis:6379
-#
-#  page-analyzer:
-#    build: ./components/page-analyzer
-#    environment:
-#      - SERVICE_PORT=9000
-#      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
-#    ports:
-#      - "9000:9000"
+  coordinator-agent:
+    build: ./components/coordinator-agent
+    environment:
+      - RABBITMQ_HOST=guest:guest@rabbitmq:5672
+      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
-  test-generator:
-    build: ./components/test-generator
+  page-analyzer:
+    build: ./components/page-analyzer
+    environment:
+      - SERVICE_PORT=9000
+      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
+    ports:
+      - "9000:9000"
+
+  flow-generator:
+    build: ./components/flow-generator
     environment:
       - SERVICE_PORT=9001
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
     ports:
       - "9001:9001"
 
-#  flower:
-#    build: ./deployment/flower
-#    environment:
-#      - BROKER_URL=amqp://guest:guest@rabbitmq:5672//
-#      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-#      - REDIS_HOST=redis:6379
-#    ports:
-#      - "5555:5555"
-#
-#  rabbitmq:
-#    image: rabbitmq:3.7.8-management-alpine
-#    ports:
-#      - "15672:15672"
-#      - "5672:5672"
-#
-#  redis:
-#    image: redis:5.0.3-alpine
-#    ports:
-#      - "6379:6379"
-#
-#  mongo:
-#    image: mongo
-#    ports:
-#      - "27017:27017"
+  pet-clinic:
+    image: jbrisbin/spring-petclinic
+    ports:
+      - "8080:8080"
+
+  gateway:
+    build: ./components/gateway
+    environment:
+      - SERVICE_PORT=9002
+      - RABBITMQ_HOST=guest:guest@rabbitmq:5672
+      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
+    ports:
+      - "9002:9002"
+    depends_on:
+      exp-test-agent:
+        condition: service_started
+
+  flower:
+    build: ./deployment/flower
+    environment:
+      - RABBITMQ_HOST=guest:guest@rabbitmq:5672
+      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
+    ports:
+      - "5555:5555"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  rabbitmq:
+    image: rabbitmq:3.7.8-management-alpine
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    healthcheck:
+      timeout: 5s
+      interval: 5s
+      retries: 5
+      test:
+        - "CMD"
+        - "rabbitmqctl"
+        - "status"
+
+  exp-test-agent:
+    build: ./components/exp-test-agent
+    environment:
+      - RABBITMQ_HOST=guest:guest@rabbitmq:5672
+      - RUNNER_URL=http://aeon-runner
+      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  aeon-runner:
+    image: aeon-runner
+    ports:
+      - "8001:8080"
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"

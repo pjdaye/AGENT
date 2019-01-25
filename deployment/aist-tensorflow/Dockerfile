@@ -10,8 +10,6 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 
-COPY . /app
-
 RUN apt-get -y update
 RUN apt-get -y install supervisor
 
@@ -22,3 +20,5 @@ ENV PATH /bin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/sbin
 COPY common/dist/aist_common-0.0.1-py3-none-any.whl /app
 
 RUN pip install aist_common-0.0.1-py3-none-any.whl
+
+COPY . /app

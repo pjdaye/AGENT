@@ -66,3 +66,5 @@ RUN cd /tmp && \
 COPY common/dist/aist_common-0.0.1-py3-none-any.whl /app
 
 RUN pip install aist_common-0.0.1-py3-none-any.whl
+
+RUN pip install supervisor-stdout

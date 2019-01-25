@@ -1,16 +1,26 @@
-import json
 import os
+
 from celery import Celery
+from kombu.common import Broadcast
 
-redis_host = "localhost:32768"
+rabbit_host = "guest:guest@localhost:5672"
 
-if 'REDIS_HOST' in os.environ:
-    redis_host = os.environ['REDIS_HOST']
+if 'RABBITMQ_HOST' in os.environ:
+    rabbit_host = os.environ['RABBITMQ_HOST']
 
-# Support for PCF.
-if 'VCAP_SERVICES' in os.environ:
-    vcap_data = json.loads(os.environ['VCAP_SERVICES'])
-    redis_cred = vcap_data['p-redis'][0]['credentials']
-    redis_host = ":{}@{}:{}".format(redis_cred['password'], redis_cred['host'], redis_cred['port'])
 
-app = Celery('test_agent', broker='redis://{}/0'.format(redis_host))
+class CeleryConf:
+    CELERY_ACCEPT_CONTENT = ['json']
+    CELERY_IMPORTS = ()
+    CELERY_QUEUES = (Broadcast('agent_broadcast_tasks'),)
+
+
+def create_app(imports):
+    app = Celery('test_agent', broker='pyamqp://{}//'.format(rabbit_host))
+    config = CeleryConf()
+    import_list = list(config.CELERY_IMPORTS)
+    for i in imports:
+        import_list.append(i)
+    config.CELERY_IMPORTS = tuple(import_list)
+    app.config_from_object(config)
+    return app
