@@ -1,15 +1,13 @@
 #!/usr/bin/env python
 import random
 
-__author__ = "DionnyS"
-__copyright__ = "Copyright 2018, Ultimate Software Group"
-__license__ = "GPL"
-__version__ = "0.1.0"
-
 import json
 import numpy as np
 import tensorflow as tf
+from aist_common.log import get_logger
 from keras.models import load_model
+
+LOGGER = get_logger('test-generator-service')
 
 
 class TestGeneratorService:
@@ -45,6 +43,13 @@ class TestGeneratorService:
                 for i in range(self.maxlen - len(query)):
                     x_pred = np.zeros((1, self.maxlen, len(self.chars)))
                     for t, char in enumerate(query):
+
+                        if char not in self.char_indices:
+                            LOGGER.error("Unsupported query token: {}. LSTM retraining will be necessary."
+                                         .format(char.upper()))
+
+                            return output
+
                         x_pred[0, t, self.char_indices[char]] = 1.
 
                     preds = self.model.predict(x_pred, verbose=0)[0]

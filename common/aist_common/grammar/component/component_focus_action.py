@@ -1,4 +1,4 @@
-from grammar.component.component_action import ComponentAction
+from aist_common.grammar.component.component_action import ComponentAction
 
 
 class ComponentFocusAction(ComponentAction):

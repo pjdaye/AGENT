@@ -1,43 +1,45 @@
+import pkg_resources
 from lark import Lark, Transformer
 
-from grammar.capture import Capture
-from grammar.component.component import Component
-from grammar.component.component_action import ComponentAction
-from grammar.component.component_action_list import ComponentActionList
-from grammar.component.component_action_using_captured import ComponentActionUsingCaptured
-from grammar.component.component_action_with_capture import ComponentActionWithCapture
-from grammar.component.component_focus_action import ComponentFocusAction
-from grammar.conditional_observation_list import ConditionalObservationList
-from grammar.element_class.cancel import Cancel
-from grammar.element_class.commit import Commit
-from grammar.element_class.dropdown import Dropdown
-from grammar.element_class.error_message import ErrorMessage
-from grammar.element_class.learned_element import LearnedElement
-from grammar.element_class.Textbox import Textbox
-from grammar.equivalence_class.blank import Blank
-from grammar.equivalence_class.invalid import Invalid
-from grammar.equivalence_class.invalid_long import InvalidLong
-from grammar.equivalence_class.invalid_special_characters import InvalidSpecialCharacters
-from grammar.equivalence_class.invalid_xsr import InvalidXsr
-from grammar.equivalence_class.learned_equivalence import LearnedEquivalence
-from grammar.equivalence_class.valid import Valid
-from grammar.equivalence_class.whitespace import Whitespace
-from grammar.not_capture import NotCapture
-from grammar.observation import Observation
-from grammar.observation_in_collection import ObservationInCollection
-from grammar.observation_list import ObservationList
-from grammar.observation_with_capture import ObservationWithCapture
-from grammar.qualifier.disabled_qualifier import DisabledQualifier
-from grammar.qualifier.learned_qualifier import LearnedQualifier
-from grammar.qualifier.qualifier_list import QualifierList
-from grammar.qualifier.required_qualifier import RequiredQualifier
-from grammar.qualifier.screen_qualifier import ScreenQualifier
-from grammar.test_flow import TestFlow
+from aist_common.grammar.capture import Capture
+from aist_common.grammar.component.component import Component
+from aist_common.grammar.component.component_action import ComponentAction
+from aist_common.grammar.component.component_action_list import ComponentActionList
+from aist_common.grammar.component.component_action_using_captured import ComponentActionUsingCaptured
+from aist_common.grammar.component.component_action_with_capture import ComponentActionWithCapture
+from aist_common.grammar.component.component_focus_action import ComponentFocusAction
+from aist_common.grammar.conditional_observation_list import ConditionalObservationList
+from aist_common.grammar.element_class.cancel import Cancel
+from aist_common.grammar.element_class.commit import Commit
+from aist_common.grammar.element_class.dropdown import Dropdown
+from aist_common.grammar.element_class.error_message import ErrorMessage
+from aist_common.grammar.element_class.learned_element import LearnedElement
+from aist_common.grammar.element_class.Textbox import Textbox
+from aist_common.grammar.equivalence_class.blank import Blank
+from aist_common.grammar.equivalence_class.invalid import Invalid
+from aist_common.grammar.equivalence_class.invalid_long import InvalidLong
+from aist_common.grammar.equivalence_class.invalid_special_characters import InvalidSpecialCharacters
+from aist_common.grammar.equivalence_class.invalid_xsr import InvalidXsr
+from aist_common.grammar.equivalence_class.learned_equivalence import LearnedEquivalence
+from aist_common.grammar.equivalence_class.valid import Valid
+from aist_common.grammar.equivalence_class.whitespace import Whitespace
+from aist_common.grammar.not_capture import NotCapture
+from aist_common.grammar.observation import Observation
+from aist_common.grammar.observation_in_collection import ObservationInCollection
+from aist_common.grammar.observation_list import ObservationList
+from aist_common.grammar.observation_with_capture import ObservationWithCapture
+from aist_common.grammar.qualifier.disabled_qualifier import DisabledQualifier
+from aist_common.grammar.qualifier.learned_qualifier import LearnedQualifier
+from aist_common.grammar.qualifier.qualifier_list import QualifierList
+from aist_common.grammar.qualifier.required_qualifier import RequiredQualifier
+from aist_common.grammar.qualifier.screen_qualifier import ScreenQualifier
+from aist_common.grammar.test_flow import TestFlow
 
 
 class SequenceParser:
-    def __init__(self, grammar_file='grammar/seq.g'):
-        self.parser = Lark(open(grammar_file))
+    def __init__(self):
+        grammar_data = pkg_resources.resource_filename(__name__, 'seq.g')
+        self.parser = Lark(open(grammar_data))
 
     def parse(self, sequence):
         tree = self.parser.parse(sequence)

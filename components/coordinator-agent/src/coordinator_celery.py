@@ -1,5 +1,4 @@
 import threading
-import time
 
 import celery.worker
 from aist_common.CeleryConfig.celery_app import create_app
@@ -17,3 +16,6 @@ worker = celery.worker.WorkController(app=app,
                                       queues=['test_coordinator_queue'])
 
 threading.Thread(target=worker.start).start()
+
+LOGGER.info("Celery started.")
+LOGGER.info("Agent started.")

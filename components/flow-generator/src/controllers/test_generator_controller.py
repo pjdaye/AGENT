@@ -1,10 +1,7 @@
-import json
-
 import bottle
+from aist_common.log import get_logger
 from bottle import request
 from services.test_generator_service import TestGeneratorService
-
-from aist_common.log import get_logger
 
 LOGGER = get_logger('test_generator_controller')
 

@@ -12,14 +12,14 @@ LOGGER = get_logger('flow-generator-client')
 
 class FlowGeneratorClient:
 
-    FLOW_GEN_URL = "{}v1/testSequence/predict"
+    FLOW_GEN_URL = "{}/v1/predict"
 
     def __init__(self):
         self._klass = "FlowGeneratorClient"
         self._set_envs()
 
     def _set_envs(self):
-        self.SERVICE_URL = 'http://page-analyzer'
+        self.SERVICE_URL = 'http://flow-generator'
         if 'FLOW_GENERATION_URL' in os.environ:
             self.SERVICE_URL = os.environ['FLOW_GENERATION_URL']
 
@@ -40,6 +40,9 @@ class FlowGeneratorClient:
                 expanded_sequence = " ".join(sequence).upper()
 
                 LOGGER.info("Generated flow: {}".format(expanded_sequence))
+
+                if expanded_sequence is None:
+                    return False
 
                 return expanded_sequence
             return None

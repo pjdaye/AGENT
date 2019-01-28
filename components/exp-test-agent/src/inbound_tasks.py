@@ -37,7 +37,7 @@ def handle_planned_flow(flow_data):
     planned_flow = jsonpickle.decode(flow_data)
     planned_hash = planned_flow.hash
 
-    print("RECV: ({}) {}".format(str(planned_hash), str(planned_flow.original_flow)))
+    LOGGER.info(f'Received abstract test on WORKER QUEUE: ({str(planned_hash)}) {str(planned_flow.original_flow)}.')
 
     memory_lock.acquire()
 
@@ -45,9 +45,10 @@ def handle_planned_flow(flow_data):
         celery_memory[planned_flow.initial_state.hash] = []
     celery_memory[planned_flow.initial_state.hash].append(planned_flow)
 
-    print("Flow Queues:")
+    LOGGER.info("Flow Queues:")
+
     for key, val in celery_memory.items():
-        print("State: {}, |Queue|: {}".format(str(key), str(len(val))))
+        LOGGER.info(f'State: {str(key)}, |Queue|: {str(len(val))}')
 
     print()
 

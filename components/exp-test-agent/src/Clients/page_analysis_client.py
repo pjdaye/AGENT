@@ -12,7 +12,7 @@ LOGGER = get_logger('page-analysis-client')
 
 class PageAnalysisClient:
 
-    ANALYSIS_RUN_URL = "{}v1/pageAnalysis/state/concrete"
+    ANALYSIS_RUN_URL = "{}/v1/pageAnalysis/state/concrete"
 
     def __init__(self):
         self._klass = "PageAnalysisClient"
