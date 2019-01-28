@@ -10,10 +10,10 @@ from classifier import fill_form
 from generalizer import generalize_label
 
 
-MONGO_HOST = os.environ['FORM_EXPERT_HOST'] \
-    if 'FORM_EXPERT_HOST' in os.environ else 'mongodb://mongo:27017'
-PORT = os.environ['FORM_EXPERT_PORT']  \
+PORT = os.environ['SERVICE_PORT']  \
     if 'FORM_EXPERT_PORT' in os.environ else 8080
+MONGO_HOST = os.environ['FORM_EXPERT_MONGO_URI'] \
+    if 'FORM_EXPERT_MONGO_URI' in os.environ else 'mongodb://localhost:27017'
 MONGO_DATABASE = os.environ['FORM_EXPERT_DATABASE'] \
     if 'FORM_EXPERT_DATABASE' in os.environ else 'form-expert'
 
