@@ -1,6 +1,5 @@
 # Setup
 ```bash
-docker build -t dora-python ./python_image
 docker-compose up --build
 ```
 

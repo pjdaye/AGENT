@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e # fail fast
+
 here=`pwd`
 
 docker build -f deployment/aist-python/Dockerfile -t aist-python .

@@ -1,4 +1,4 @@
-bottle==0.12.13
+bottle==0.12.16
 python-Levenshtein==0.12.0
 nltk==3.4
 spacy==2.0.18
