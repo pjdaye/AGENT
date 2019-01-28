@@ -142,26 +142,26 @@ services:
         condition: service_healthy
 
   aeon-runner-1:
-    image: aeon-runner
+    image: aista/aeon-runner
     ports:
       - "8001:8080"
 
   aeon-runner-2:
-    image: aeon-runner
+    image: aista/aeon-runner
     ports:
       - "8002:8080"
 
   aeon-runner-3:
-    image: aeon-runner
+    image: aista/aeon-runner
     ports:
       - "8003:8080"
 
   aeon-runner-4:
-    image: aeon-runner
+    image: aista/aeon-runner
     ports:
       - "8004:8080"
 
   aeon-runner-5:
-    image: aeon-runner
+    image: aista/aeon-runner
     ports:
       - "8005:8080"
