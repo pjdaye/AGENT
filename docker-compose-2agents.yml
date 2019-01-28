@@ -17,15 +17,6 @@ services:
     ports:
       - "9000:9000"
 
-  form-expert:
-    build: ./components/form-expert
-    environment:
-      - SERVICE_PORT=9003
-      - FORM_EXPERT_MONGO_URI=mongodb://mongo:27017
-      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
-    ports:
-      - "9003:9003"
-
   flow-generator:
     build: ./components/flow-generator
     environment:
@@ -47,9 +38,6 @@ services:
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
     ports:
       - "9002:9002"
-    depends_on:
-      exp-test-agent:
-        condition: service_started
 
   flower:
     build: ./deployment/flower
@@ -81,11 +69,11 @@ services:
     ports:
       - "27017:27017"
 
-  exp-test-agent:
+  exp-test-agent-1:
     build: ./components/exp-test-agent
     environment:
       - RABBITMQ_HOST=guest:guest@rabbitmq:5672
-      - RUNNER_URL=http://aeon-runner:8080
+      - RUNNER_URL=http://aeon-runner-1:8080
       - PAGE_ANALYSIS_URL=http://page-analyzer:9000
       - FLOW_GENERATION_URL=http://flow-generator:9001
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
@@ -93,11 +81,24 @@ services:
       rabbitmq:
         condition: service_healthy
 
-  aeon-runner:
+  exp-test-agent-2:
+    build: ./components/exp-test-agent
+    environment:
+      - RABBITMQ_HOST=guest:guest@rabbitmq:5672
+      - RUNNER_URL=http://aeon-runner-2:8080
+      - PAGE_ANALYSIS_URL=http://page-analyzer:9000
+      - FLOW_GENERATION_URL=http://flow-generator:9001
+      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  aeon-runner-1:
     image: aeon-runner
     ports:
       - "8001:8080"
 
-  mongo:
-    image: mongo
+  aeon-runner-2:
+    image: aeon-runner
     ports:
+      - "8002:8080"

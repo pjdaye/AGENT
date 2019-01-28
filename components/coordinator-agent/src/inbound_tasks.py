@@ -16,10 +16,15 @@ app = create_app([])
 def coordinator_handle_planned_flow(flow_data):
     planned_flow = jsonpickle.decode(flow_data)
     planned_hash = planned_flow.hash
+
+    msg = "Received abstract test on COORDINATOR QUEUE:"
+
     if planned_hash in processed_tests:
-        print("SKIP: ({}) {}".format(str(planned_hash), str(planned_flow.original_flow)))
+        LOGGER.info(f'{msg} ({str(planned_hash)}) {str(planned_flow.original_flow)}. (DUPLICATE)')
     else:
-        print("PROC: ({}) {}".format(str(planned_hash), str(planned_flow.original_flow)))
+        LOGGER.info(f'{msg} ({str(planned_hash)}) {str(planned_flow.original_flow)}. (NEW)')
+        LOGGER.info('Publishing to round-robin WORKER QUEUE.')
+
         AgentFlowPublisher.publish(flow_data)
         processed_tests.add(planned_hash)
     return True

@@ -1,6 +1,7 @@
 import random
 
 from aide.aide_mock import AIDEMock
+from aist_common.grammar.sequence_parser import SequenceParser
 from abstraction.state_abstracter import StateAbstracter
 from clients.flow_generation_client import FlowGeneratorClient
 from clients.page_analysis_client import PageAnalysisClient
@@ -8,7 +9,6 @@ from clients.runner_client import RunnerClient
 from defects.defect_reporter import DefectReporter
 from flow_execution.flow_executor import FlowExecutor
 from flow_execution.flow_planner import FlowPlanner
-from grammar.sequence_parser import SequenceParser
 from memory.priority_memory import PriorityMemory
 from outbound_tasks import PlannedFlowPublisher
 from perceive.label_extraction import LabelExtraction
@@ -21,7 +21,6 @@ LOGGER = get_logger('agent-loop')
 
 
 class AgentLoop:
-
     NUM_ITERATIONS = 1000
 
     def __init__(self, sut_url, runner_url):
@@ -57,10 +56,23 @@ class AgentLoop:
         launched = self.web_driver.launch(self.sut_url)
 
         if not launched:
-            raise Exception("Unable to start session.")
+            return
 
         for i in range(AgentLoop.NUM_ITERATIONS):
-            self._loop_iteration()
+            LOGGER.info(f"Starting loop iteration {str(i)}.")
+
+            # noinspection PyBroadException
+            try:
+                self._loop_iteration()
+            except Exception:
+                LOGGER.exception(f"Fatal error during iteration {str(i)}.")
+                LOGGER.info(f"Stopping session.")
+                break
+
+        self._loop_end()
+
+    def _loop_end(self):
+        self.web_driver.quit()
 
     def _loop_iteration(self):
         concrete_state = self.web_driver.concrete_state()
@@ -96,7 +108,7 @@ class AgentLoop:
         for observation in observations:
             LOGGER.info("Perceived: {}".format(str(observation)))
             generated_flow = self.flow_generator.generate_flow(str(observation))
-            if generated_flow is not False:
+            if generated_flow is not None and generated_flow is not False:
                 LOGGER.info("Generated flow: {}".format(generated_flow))
                 parsed_flow = self.seq_parser.parse(generated_flow)
                 if parsed_flow:
@@ -113,6 +125,10 @@ class AgentLoop:
             test_execution_queue = celery_memory[act_state.hash]
             if len(test_execution_queue) > 0:
                 planned_flow_to_execute = test_execution_queue.pop(0)
+                planned_flow_to_execute.calculate_hash()
+
+                LOGGER.info(f'De-queued abstract test off from WORKER QUEUE: {planned_flow_to_execute.hash}')
+
                 memory_lock.release()
                 self.flow_exec.execute(act_state, self.web_driver, planned_flow_to_execute)
                 return
@@ -123,7 +139,14 @@ class AgentLoop:
 
         # If we're here, we didn't execute a flow.  Are there any?
         if len(test_flow_queue) > 0:
-            self.flow_exec.execute(act_state, self.web_driver, test_flow_queue[0])
+
+            LOGGER.info("No abstract tests on WORKER QUEUE. Executing first available abstract test.")
+
+            is_ok = self.flow_exec.execute(act_state, self.web_driver, test_flow_queue[0])
+
+            if not is_ok:
+                raise Exception("Unable to execute flow step.")
+
             return
 
         if self.memory.in_memory(act_state.hash):

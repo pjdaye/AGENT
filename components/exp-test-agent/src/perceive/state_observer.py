@@ -1,9 +1,9 @@
-from grammar.component.component import Component
-from grammar.element_class.dropdown import Dropdown
-from grammar.element_class.error_message import ErrorMessage
-from grammar.element_class.Textbox import Textbox
-from grammar.observation import Observation
-from grammar.qualifier_classifier import QualifierClassifier
+from aist_common.grammar.component.component import Component
+from aist_common.grammar.element_class.dropdown import Dropdown
+from aist_common.grammar.element_class.error_message import ErrorMessage
+from aist_common.grammar.element_class.Textbox import Textbox
+from aist_common.grammar.observation import Observation
+from aist_common.grammar.qualifier_classifier import QualifierClassifier
 
 
 class StateObserver:

@@ -1,4 +1,4 @@
-from grammar.observation import Observation
+from aist_common.grammar.observation import Observation
 
 
 class ObservationWithCapture(Observation):

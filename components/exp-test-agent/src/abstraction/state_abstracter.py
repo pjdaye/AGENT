@@ -42,10 +42,10 @@ class StateAbstracter:
         if selector in selectors:
             current_index = selectors[selector]
             selectors[selector] = selectors[selector] + 1
-            selector += ":eq({})".format(current_index+1)
+            selector += ":visible:eq({})".format(current_index+1)
         else:
             selectors[selector] = 0
-            selector += ":eq(0)"
+            selector += ":visible:eq(0)"
         return selector
 
     @staticmethod

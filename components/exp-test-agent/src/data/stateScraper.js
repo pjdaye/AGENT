@@ -1,10 +1,3 @@
-// NOTE:
-//   This script is shared with the chrome extension.
-//   Have a care when making changes to ensure it is compatible
-// NOTE:
-//   DO NOT edit this in the chrome extension folder.  Instead, edit in python-runner/src/js and build.
-//
-
 function isElementOrParentOfElement(left, right) {
     var attempt = left == right;
 
@@ -239,10 +232,6 @@ function calculate_position(element_node) {
         }
     }
 
-    // ABS offset = 20
-    // REC offset = 0
-    //  TODO:  Determine why offset is needed in ABS
-    //
     var offset = 0;
     if (tag === "input") {
         position.y -= offset;
@@ -281,12 +270,6 @@ function makeBaseElement(element, position, tagName) {
     var tag = tagName.toLowerCase();
 
     if (tag == "select") {
-        // NOTE (DS):
-        // It is possible for underlying SELECT values to change (ex: GUIDs in Recruiting)
-        // for the "same" option when moving across different environments. Due to this,
-        // we have decided to set the OPTION text to both "values" and "valuesText".
-        // "values" then is a disguised representation of values.
-
         domAttributes["value"] = element.find("option:selected").text();
     }
 
@@ -340,13 +323,6 @@ function makeDOMElement(element_node) {
             text.push(new_value_text);
         });
 
-        // NOTE (DS):
-        // It is possible for underlying SELECT values to change (ex: GUIDs in Recruiting)
-        // for the "same" option when moving across different environments. Due to this,
-        // we have decided to set the OPTION text to both "values" and "valuesText".
-        // "values" then is a disguised representation of values.
-
-        // domAttributes['values'] = values;
         domAttributes["values"] = text;
         domAttributes["valuesText"] = text;
     }
@@ -488,15 +464,6 @@ function cross_site(uri1, uri2) {
 function get_host_from_url(url) {
     var parser = document.createElement("a");
     parser.href = url;
-
-    // // "http://example.com:3000/pathname/?search=test#hash"
-    // parser.protocol; // => "http:"
-    // parser.hostname; // => "example.com"
-    // parser.port;     // => "3000"
-    // parser.pathname; // => "/pathname/"
-    // parser.search;   // => "?search=test"
-    // parser.hash;     // => "#hash"
-    // parser.host;     // => "example.com:3000"
 
     return parser.hostname;
 }

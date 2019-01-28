@@ -175,8 +175,6 @@ class PageAnalysisService:
             if errorMessage not in data["errorMessages"]:
                 data["errorMessages"].append(errorMessage)
 
-        LOGGER.info('THIRD PROCESSING')
-
         for data_point in df_sec.values:
             widget_key = data_point[0]
             if data_point[4] == 0.0:
@@ -186,7 +184,7 @@ class PageAnalysisService:
             if pred[0] == 1 and widget_key not in self.negativeStorage["pageTitles"]:
                 data["pageTitles"].append(widget_key)
 
-        LOGGER.info('Processing Titles ')
+        LOGGER.info('Processing titles')
 
         for pageTitle in self.storage["pageTitles"]:
             if pageTitle not in data["pageTitles"]:
