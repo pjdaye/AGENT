@@ -97,7 +97,3 @@ services:
     image: aeon-runner
     ports:
       - "8001:8080"
-
-  mongo:
-    image: mongo
-    ports:
