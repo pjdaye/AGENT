@@ -70,7 +70,7 @@ services:
     healthcheck:
       timeout: 5s
       interval: 5s
-      retries: 5
+      retries: 10
       test:
         - "CMD"
         - "rabbitmqctl"
@@ -88,6 +88,7 @@ services:
       - RUNNER_URL=http://aeon-runner:8080
       - PAGE_ANALYSIS_URL=http://page-analyzer:9000
       - FLOW_GENERATION_URL=http://flow-generator:9001
+      - FORM_EXPERT_URL=http://form-expert:9003
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
     depends_on:
       rabbitmq:

@@ -1,6 +1,6 @@
 import random
 
-from aide.aide_mock import AIDEMock
+from aide.aide import AIDE
 from aist_common.grammar.sequence_parser import SequenceParser
 from abstraction.state_abstracter import StateAbstracter
 from clients.flow_generation_client import FlowGeneratorClient
@@ -29,7 +29,7 @@ class AgentLoop:
 
         self.mapper = StateAbstracter()
         self.ext_labels = LabelExtraction()
-        self.aide = AIDEMock()
+        self.aide = AIDE()
         self.memory = PriorityMemory()
         self.observer = StateObserver()
         self.seq_parser = SequenceParser()

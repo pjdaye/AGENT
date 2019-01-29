@@ -1,18 +1,23 @@
 import random
+import requests
+import os
 
 
-class AIDEMock:
+class AIDE:
     def __init__(self):
-        pass
+        self.FORM_EXPERT_URL = 'http://form-expert'
+        if 'FORM_EXPERT_URL' in os.environ:
+            self.FORM_EXPERT_URL = os.environ['FORM_EXPERT_URL']
+
+        self.FILL_FORM_URL = '{}/api/v1/fill_form'.format(self.FORM_EXPERT_URL)
 
     @staticmethod
     def get_input_types():
         return ['VALID', 'BLANK', 'WHITESPACE', 'INVALID_LONG', 'INVALID_SPECIAL_CHARACTERS', 'INVALID_XSR']
 
-    @staticmethod
-    def get_concrete_inputs(label, input_class):
+    def get_concrete_inputs(self, label, input_class):
         if input_class == 'VALID':
-            return AIDEMock.get_concrete_value(label)
+            return self.get_concrete_value(label)
         elif input_class == 'BLANK':
             values = ['']
             return random.choice(values)
@@ -29,8 +34,20 @@ class AIDEMock:
             values = ['<script>alert("test");</script>']
             return random.choice(values)
 
-    @staticmethod
-    def get_concrete_value(label):
+    def get_concrete_value(self, label):
+
+        payload = [
+            {
+                'label': label,
+                'id': label
+            }
+        ]
+        response = requests.post(self.FILL_FORM_URL, json=payload, verify=False)
+
+        if response.status_code == 200 and label in response.json():
+            return response.json()[label]
+
+        # Fall back to mock data
         label = label.replace(' ', '').upper()
         if label == "LASTNAME":
             values = ['King', 'Santiago', 'Adamo', 'Briggs', 'Vanderwall', 'Maliani', 'Muras', 'Mattera', 'Alt', 'Phillips', 'Daye', 'Peixoto', 'Pava', 'Dalvi', 'Vaswanathan']
