@@ -94,6 +94,6 @@ services:
         condition: service_healthy
 
   aeon-runner:
-    image: aeon-runner
+    image: aista/aeon-runner
     ports:
       - "8001:8080"

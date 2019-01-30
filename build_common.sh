@@ -5,6 +5,10 @@ set -e # fail fast
 here=`pwd`
 
 cd common
+
+# Clean any previously created files.
+rm -rf dist
+
 python3 setup.py sdist bdist_wheel
 
 # Delete intermediate files.

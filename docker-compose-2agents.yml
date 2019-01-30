@@ -106,11 +106,11 @@ services:
         condition: service_healthy
 
   aeon-runner-1:
-    image: aeon-runner
+    image: aista/aeon-runner
     ports:
       - "8001:8080"
 
   aeon-runner-2:
-    image: aeon-runner
+    image: aista/aeon-runner
     ports:
       - "8002:8080"
