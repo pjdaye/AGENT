@@ -80,6 +80,8 @@ services:
     image: mongo
     ports:
       - "27017:27017"
+    volumes:
+      - data/form-expert
 
   exp-test-agent:
     build: ./components/exp-test-agent
