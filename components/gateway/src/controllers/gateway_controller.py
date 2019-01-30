@@ -14,6 +14,7 @@ class GatewayController:
     def add_routes(self):
         self._app.route('/v1/status', method="GET", callback=self.get_status)
         self._app.route('/v1/start', method="POST", callback=self.start_session)
+        self._app.route('/v1/stop', method="POST", callback=self.stop_session)
 
     @staticmethod
     def get_status():
@@ -22,4 +23,8 @@ class GatewayController:
     def start_session(self):
         request_payload = request.json
         session = self._service.start_session(request_payload)
+        return bottle.HTTPResponse(body=session, status=200)
+
+    def stop_session(self):
+        session = self._service.stop_session()
         return bottle.HTTPResponse(body=session, status=200)

@@ -1,17 +1,33 @@
+"""A form filling strategy that attempts to fill out all settable form fields with valid values."""
+
 from aist_common.log import get_logger
 
 LOGGER = get_logger('fill-entire-form-strategy')
 
 
 class FillEntireForm:
-    def __init__(self, aide):
-        self.aide = aide
+    """A form filling strategy that attempts to fill out all settable form fields with valid values."""
+
+    def __init__(self, form_expert):
+        """ Initializes the FillEntireForm class.
+        :param form_expert: An instance of the form expert client.
+        """
+
+        self.form_expert = form_expert
         self._klass = __class__.__name__
 
-    def execute(self, runner, aut_state):
-        for actionable_widget in aut_state.widgets:
+    def execute(self, runner, abstract_state):
+        """ Executes the form filling strategy against a given abstract state.
+
+        :param runner: An instance of the runner client (that holds an active runner session).
+        :param abstract_state: The current abstract state for the page that needs to be filled out.
+
+        :return: True if all settable form fields were successfully filled.
+        """
+
+        for actionable_widget in abstract_state.widgets:
             if 'set' in actionable_widget['actions']:
-                value = self.aide.get_concrete_value(actionable_widget['label'])
+                value = self.form_expert.get_concrete_value(actionable_widget['label'])
 
                 LOGGER.info("Filling form field {}: {}.".format(actionable_widget['key'], value))
 
