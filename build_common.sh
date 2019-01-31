@@ -9,7 +9,13 @@ cd common
 # Clean any previously created files.
 rm -rf dist
 
-python3 setup.py sdist bdist_wheel
+if [ "$(expr substr $(uname -s) 1 5)" == "MINGW" ]; then
+    echo "Windows Environment"
+    python setup.py sdist bdist_wheel
+else
+    echo "Not Windows Environment"
+    python3 setup.py sdist bdist_wheel
+fi
 
 # Delete intermediate files.
 rm -rf aist_common.egg-info
