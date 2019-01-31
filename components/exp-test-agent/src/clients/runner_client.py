@@ -1,3 +1,4 @@
+"""A client that communicates with and provides the capabilities of the runner service."""
 import json
 import os
 import time
@@ -11,11 +12,18 @@ LOGGER = get_logger('runner-client')
 
 
 class RunnerClient:
+    """A client that communicates with and provides the capabilities of the runner service."""
+
     GET_DOCUMENT_LOC = "return document.location.href;"
     HAS_JQUERY_SCRIPT = "if(window.jQuery) return true; return false;"
     FIX_JQUERY_SCRIPT = "if(window.jQuery && !window.jquery) window.jquery = window.jQuery;"
 
     def __init__(self, runner_url):
+        """ Initializes the RunnerClient class.
+
+        :param runner_url: The URL to the Aeon runner to be used.
+        """
+
         self._klass = "RunnerClient"
         self.RUNNER_URL = runner_url
         self.session = None
@@ -32,6 +40,14 @@ class RunnerClient:
             self.CHECK_READY_SCRIPT = file.read().replace('\n', ' ')
 
     def launch(self, url):
+        """ Communicates with the runner service to launch a runner session
+            and navigate to the SUT URL.
+
+        :param url: The URL to navigate to.
+
+        :return: True if the runner session was successfully launched.
+        """
+
         LOGGER.info("Launching runner: {} to {}".format(self.RUNNER_URL, url))
 
         try:
@@ -58,6 +74,13 @@ class RunnerClient:
             return False
 
     def navigate(self, url):
+        """ Sends a navigation request to a runner session.
+
+        :param url: The URL to navigate to.
+
+        :return: True if the navigation request succeeded.
+        """
+
         try:
             self.session.execute_command('GoToUrlCommand', [url])
 
@@ -69,6 +92,15 @@ class RunnerClient:
             return False
 
     def perform_action(self, selector, action, value=None):
+        """ Sends an action request to a runner session.
+
+        :param selector: The selector of the element to be interacted with.
+        :param action: The requested interaction (e.g. Click, Set).
+        :param value: If the desired interaction is "Set", the value to set the element to.
+
+        :return: True if the action request succeeded.
+        """
+
         try:
             css = {'type': 'jQuery', 'value': selector}
             if action.upper() == 'SET':
@@ -84,6 +116,11 @@ class RunnerClient:
             return False
 
     def quit(self):
+        """ Sends a quit request to a runner session.
+
+        :return: True if the quit request succeeded.
+        """
+
         try:
             self.session.quit_session()
 
@@ -95,6 +132,11 @@ class RunnerClient:
             return False
 
     def concrete_state(self):
+        """ Collects the current concrete state of the page that the active runner session is currently on.
+
+        :return: A concrete state.
+        """
+
         try:
             resp = self.session.execute_command('ExecuteScriptCommand', [self.GET_DOCUMENT_LOC])
 
@@ -149,6 +191,14 @@ class RunnerClient:
 
     @staticmethod
     def _get_empty_concrete_state(url, title):
+        """ Constructs a concrete state that has a title and URL, but no widgets.
+
+        :param url: The URL to assign to the concrete state.
+        :param title: The title to assign to the concrete state.
+
+        :return: A concrete state.
+        """
+
         return {
             "url": url,
             "title": title,
@@ -157,6 +207,11 @@ class RunnerClient:
         }
 
     def _is_dom_loaded(self):
+        """ Checks for browser document ready state.
+
+        :return: True if the browser document has completed loading.
+        """
+
         LOGGER.info('Checking for DOM ready state...')
         attempts = 0
         dom_loaded = False

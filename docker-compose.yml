@@ -17,14 +17,14 @@ services:
     ports:
       - "9000:9000"
 
-  form-expert:
-    build: ./components/form-expert
-    environment:
-      - SERVICE_PORT=9003
-      - FORM_EXPERT_MONGO_URI=mongodb://mongo:27017
-      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
-    ports:
-      - "9003:9003"
+#  form-expert:
+#    build: ./components/form-expert
+#    environment:
+#      - SERVICE_PORT=9003
+#      - FORM_EXPERT_MONGO_URI=mongodb://mongo:27017
+#      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
+#    ports:
+#      - "9003:9003"
 
   flow-generator:
     build: ./components/flow-generator
@@ -70,7 +70,7 @@ services:
     healthcheck:
       timeout: 5s
       interval: 5s
-      retries: 5
+      retries: 10
       test:
         - "CMD"
         - "rabbitmqctl"

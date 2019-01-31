@@ -1,3 +1,4 @@
+"""Executes a concrete test flow."""
 from form_strategies.fill_entire_form import FillEntireForm
 
 from aist_common.log import get_logger
@@ -6,17 +7,37 @@ LOGGER = get_logger('flow-executor')
 
 
 class FlowExecutor:
-    def __init__(self, aide, pac, mapper, ext_labels, observer, defect_rep):
-        self.aide = aide
-        self.web_classifier = pac
-        self.page_abstraction = mapper
-        self.ext_labels = ext_labels
+    """Executes a concrete test flow."""
+
+    def __init__(self, form_expert, page_analyzer, state_abstracter, label_extracter, observer, defect_rep):
+        """ Initializes the FlowExecutor class.
+        
+        :param form_expert: An instance of the form expert client.
+        :param page_analyzer: An instance of the page analyzer client.
+        :param state_abstracter: An instance of the StateAbstracter class.
+        :param label_extracter: An instance of the LabelExtraction class.
+        :param observer: An instance of the StateObserver class.
+        :param defect_rep: An instance of the DefectReporter class.
+        """
+
+        self.aide = form_expert
+        self.page_analyzer = page_analyzer
+        self.state_abstracter = state_abstracter
+        self.ext_labels = label_extracter
         self.observer = observer
         self.defect_rep = defect_rep
-        self.form_fill_strategy = FillEntireForm(aide)
+        self.form_fill_strategy = FillEntireForm(form_expert)
         self._klass = __class__.__name__
 
-    def execute(self, initial_state, runner, planned_flow):
+    def execute(self, initial_state, runner, concrete_flow):
+        """ Executes a concrete test flow. Reports any issues found during execution.
+
+        :param initial_state: The current abstract state (where the concrete test flow execution begins from).
+        :param runner: An instance of the runner client (that holds an active runner session).
+        :param concrete_flow: The concrete test flow to execute.
+
+        :return: True if the concrete test flow execution succeeded.
+        """
 
         ok = self.form_fill_strategy.execute(runner, initial_state)
 
@@ -24,7 +45,7 @@ class FlowExecutor:
             LOGGER.error("Unable to execute form fill strategy on state: " + str(initial_state.hash))
             return False
 
-        for step in planned_flow.bound_actions:
+        for step in concrete_flow.bound_actions:
             action = step[0]
             widget = step[1]
 
@@ -55,9 +76,9 @@ class FlowExecutor:
             LOGGER.error("Unable to execute flow observe step.")
             return False
 
-        page_analysis = self.web_classifier.run_analysis(concrete_state)
+        page_analysis = self.page_analyzer.run_analysis(concrete_state)
 
-        act_state = self.page_abstraction.process(concrete_state)
+        act_state = self.state_abstracter.process(concrete_state)
 
         self.ext_labels.extract_labels(act_state, page_analysis)
 
@@ -65,7 +86,7 @@ class FlowExecutor:
 
         actual_observation_hashes = [hash(obs) for obs in observations]
 
-        flow = planned_flow.original_flow
+        flow = concrete_flow.original_flow
 
         for i in range(len(flow.observe.observations)):
             expected_observation = flow.observe.observations[i]
@@ -74,6 +95,6 @@ class FlowExecutor:
             success = success or not expected_observation.observe and expected_hash not in actual_observation_hashes
             if not success:
                 LOGGER.info("Found defect on state: " + str(act_state.hash))
-                self.defect_rep.add_defect(flow, planned_flow.bound_actions, i)
+                self.defect_rep.add_defect(flow, concrete_flow.bound_actions, i)
 
         return True
