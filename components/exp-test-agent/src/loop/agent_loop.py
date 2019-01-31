@@ -12,7 +12,6 @@ from clients.runner_client import RunnerClient
 from defects.defect_reporter import DefectReporter
 from flow_execution.flow_executor import FlowExecutor
 from flow_execution.flow_planner import FlowPlanner
-from memory.agent_memory import session_stop
 from memory.priority_memory import PriorityMemory
 from outbound_tasks import PlannedFlowPublisher
 from perceive.label_extraction import LabelExtraction
@@ -69,6 +68,7 @@ class AgentLoop:
         loop_thread.start()
 
     def _loop_start(self):
+
         """ Runs the main control loop.
             Starts by launching the runner, then executes AgentLoop.NUM_ITERATIONS loop iterations.
 
@@ -83,7 +83,7 @@ class AgentLoop:
         for i in range(AgentLoop.NUM_ITERATIONS):
             LOGGER.info(f"Starting loop iteration {str(i)}.")
 
-            if session_stop:
+            if general_memory['SESSION_STOPPED']:
                 LOGGER.info(f"Stopping session due to user stop request.")
                 break
 
@@ -234,6 +234,11 @@ class AgentLoop:
         value = None
 
         if action == 'set':
+
+            if chosen_widget['label'] is None:
+                LOGGER.warning(f"Attempting to set widget ${chosen_widget['key']}, but no widget label found.")
+                return
+
             value = self.form_expert.get_concrete_value(chosen_widget['label'])
             pass
 

@@ -24,8 +24,6 @@ def start_session(session_start_data):
     :return: True if the agent started successfully.
     """
 
-    global session_stop
-
     LOGGER.info("Starting session.")
 
     sut_url = session_start_data['SUT_URL']
@@ -37,7 +35,7 @@ def start_session(session_start_data):
 
     runner_url = os.environ['RUNNER_URL']
 
-    session_stop = False
+    general_memory['SESSION_STOPPED'] = False
 
     AgentLoop(sut_url, runner_url).start()
 
@@ -51,11 +49,9 @@ def stop_session():
     :return: True if the agent received the stop request successfully.
     """
 
-    global session_stop
-
     LOGGER.info("Stopping session.")
 
-    session_stop = True
+    general_memory['SESSION_STOPPED'] = True
 
     return True
 

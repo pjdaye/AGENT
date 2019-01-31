@@ -8,5 +8,5 @@ celery_memory = {}
 global memory_lock
 memory_lock = threading.Lock()
 
-global session_stop
-session_stop = False
+global general_memory
+general_memory = {}
