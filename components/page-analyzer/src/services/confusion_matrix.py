@@ -24,10 +24,3 @@ def print_cm(cm, labels, hide_zeroes=False, hide_diagonal=False, hide_threshold=
         print()
 
     print()
-
-
-def insert_row(idx, df, df_insert):
-    df_a = df.iloc[:idx, ]
-    df_b = df.iloc[idx:, ]
-    df = df_a.append(df_insert).append(df_b).reset_index(drop=True)
-    return df

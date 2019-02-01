@@ -45,8 +45,8 @@ class TestGeneratorService:
                     for t, char in enumerate(query):
 
                         if char not in self.char_indices:
-                            LOGGER.error("Unsupported query token: {}. LSTM retraining will be necessary."
-                                         .format(char.upper()))
+                            LOGGER.warning("Unsupported query token: {}. LSTM retraining will be necessary."
+                                           .format(char.upper()))
 
                             return output
 

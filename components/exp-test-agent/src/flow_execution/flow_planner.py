@@ -41,7 +41,7 @@ class FlowPlanner:
                 widget = abstract_state.find_widget_with_label(action.component.ident, 'set')
 
                 if not widget:
-                    LOGGER.error("Unable to bind flow act step: " + str(action))
+                    LOGGER.warning("Unable to bind flow act step: " + str(action))
                     return False
 
                 plan_steps.append([(action, widget)])
@@ -53,7 +53,7 @@ class FlowPlanner:
                     element_class = action.equivalence_class.ident
 
                 if element_class not in page_analysis['analysis']:
-                    LOGGER.error("Unable to bind flow act step: " + str(action))
+                    LOGGER.warning("Unable to bind flow act step: " + str(action))
                     return False
 
                 candidate_widgets = page_analysis['analysis'][element_class]

@@ -223,6 +223,7 @@ class PageAnalysisService:
 
         features = df_in_use.columns[:-1]
         train_true_y = df_in_use['Class']
+        train_true_y = train_true_y.astype('int')
 
         clf = RandomForestClassifier(n_estimators=100)
 
