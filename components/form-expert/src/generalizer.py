@@ -1,11 +1,11 @@
 import re
 
-import nltk
 from nltk.corpus import wordnet
 import spacy
 
 print('Loading Spacy EN')
 en_nlp = spacy.load('en')
+
 
 def generalize_label(input_label):
     result = input_label
