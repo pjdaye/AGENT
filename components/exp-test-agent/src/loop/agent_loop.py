@@ -3,10 +3,10 @@
 
 import random
 
-from aide.aide import AIDE
 from aist_common.grammar.sequence_parser import SequenceParser
 from abstraction.state_abstracter import StateAbstracter
 from clients.flow_generation_client import FlowGeneratorClient
+from clients.form_expert_client import FormExpertClient
 from clients.page_analysis_client import PageAnalysisClient
 from clients.runner_client import RunnerClient
 from defects.defect_reporter import DefectReporter
@@ -41,7 +41,7 @@ class AgentLoop:
 
         self.mapper = StateAbstracter()
         self.label_extracter = LabelExtraction()
-        self.form_expert = AIDE()
+        self.form_expert = FormExpertClient()
         self.memory = PriorityMemory()
         self.observer = StateObserver()
         self.seq_parser = SequenceParser()
@@ -240,7 +240,6 @@ class AgentLoop:
                 return
 
             value = self.form_expert.get_concrete_value(chosen_widget['label'])
-            pass
 
         LOGGER.info("Performing action {} on widget {}.".format(action, chosen_widget["key"]))
 

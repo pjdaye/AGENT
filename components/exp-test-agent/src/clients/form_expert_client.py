@@ -5,10 +5,10 @@ import os
 
 from aist_common.log import get_logger
 
-LOGGER = get_logger('aide')
+LOGGER = get_logger('form-expert-client')
 
 
-class AIDE:
+class FormExpertClient:
     def __init__(self):
         self.FORM_EXPERT_URL = 'http://form-expert'
         if 'FORM_EXPERT_URL' in os.environ:
