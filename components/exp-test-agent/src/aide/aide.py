@@ -1,6 +1,11 @@
+import json
 import random
 import requests
 import os
+
+from aist_common.log import get_logger
+
+LOGGER = get_logger('aide')
 
 
 class AIDE:
@@ -34,6 +39,35 @@ class AIDE:
             values = ['<script>alert("test");</script>']
             return random.choice(values)
 
+    def get_concrete_values(self, widgets):
+
+        payload = [
+            {
+                'label': w['label'],
+                'id': w['label_key']
+            } for w in widgets
+        ]
+
+        LOGGER.info('Payload: ' + json.dumps(payload))
+
+        response = requests.post(self.FILL_FORM_URL, json=payload, verify=False)
+
+        if response.status_code is not 200:
+            raise EnvironmentError('Error retrieving data from form expert')
+
+        results = response.json()
+
+        for widget in widgets:
+            LOGGER.info('Widget key: ' + widget['label_key'])
+            if widget['label_key'] not in results or results[widget['label_key']] is None:
+                widget['value'] = self.fallback(widget['label'])
+                LOGGER.info('Fallback generated: ' + widget['value'])
+            else:
+                widget['value'] = results[widget['label_key']]
+
+        LOGGER.info('Resulting widgets: ' + json.dumps(widgets))
+        return widgets
+
     def get_concrete_value(self, label):
 
         payload = [
@@ -42,12 +76,22 @@ class AIDE:
                 'id': label
             }
         ]
+        LOGGER.info('Payload: ' + json.dumps(payload))
+
         response = requests.post(self.FILL_FORM_URL, json=payload, verify=False)
 
-        if response.status_code == 200 and label in response.json():
+        if response.status_code == 200 and label in response.json() and response.json()[label] is not None:
+            LOGGER.info("Form expert response: " + response.json()[label])
             return response.json()[label]
 
         # Fall back to mock data
+        value = self.fallback(label)
+        LOGGER.info('Fallback generated: ' + value)
+        return value
+
+    @staticmethod
+    def fallback(label):
+        LOGGER.info('Fallback for: ' + label)
         label = label.replace(' ', '').upper()
         if label == "LASTNAME":
             values = ['King', 'Santiago', 'Adamo', 'Briggs', 'Vanderwall', 'Maliani', 'Muras', 'Mattera', 'Alt', 'Phillips', 'Daye', 'Peixoto', 'Pava', 'Dalvi', 'Vaswanathan']

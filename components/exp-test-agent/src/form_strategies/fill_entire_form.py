@@ -9,15 +9,16 @@ class FillEntireForm:
         self._klass = __class__.__name__
 
     def execute(self, runner, aut_state):
-        for actionable_widget in aut_state.widgets:
-            if 'set' in actionable_widget['actions']:
-                value = self.aide.get_concrete_value(actionable_widget['label'])
 
-                LOGGER.info("Filling form field {}: {}.".format(actionable_widget['key'], value))
+        actionable_widgets = [w for w in aut_state.widgets if 'set' in w['actions']]
+        actionable_widgets = self.aide.get_concrete_values(actionable_widgets)
 
-                ok = runner.perform_action(actionable_widget["selector"], 'set', value)
+        for actionable_widget in actionable_widgets:
+            LOGGER.info("Filling form field {}: {}.".format(actionable_widget['key'], actionable_widget['value']))
 
-                if not ok:
-                    LOGGER.error(self._klass, "execute", "Unable to fill form field: " + actionable_widget['key'])
-                    return False
+            ok = runner.perform_action(actionable_widget["selector"], 'set', actionable_widget['value'])
+
+            if not ok:
+                LOGGER.error(self._klass, "execute", "Unable to fill form field: " + actionable_widget['key'])
+                return False
         return True
