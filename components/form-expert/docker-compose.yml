@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 
 services:
   form-expert:
@@ -8,6 +8,13 @@ services:
     environment:
       - SERVICE_PORT=80
       - FORM_EXPERT_MONGO_URI=mongodb://mongo:27017
+    healthcheck:
+      test: curl --fail -s http://localhost:80/ || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      - mongo
       
   mongo:
     image: 'mongo'

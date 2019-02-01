@@ -3,7 +3,7 @@ import json
 import os
 
 import bottle
-from bottle import post, run, request, response
+from bottle import get, post, run, request, response
 from pymongo import MongoClient
 
 from classifier import fill_form
@@ -80,6 +80,10 @@ def fill_form_endpoint():
 }
 """
 
+
+@get('/api/v1/health_check')
+def health_check():
+    return json.dumps({'healthy': True})
 
 def transform_form(form):
     features = []

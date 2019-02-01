@@ -25,15 +25,15 @@ class FillEntireForm:
         :return: True if all settable form fields were successfully filled.
         """
 
-        for actionable_widget in abstract_state.widgets:
-            if 'set' in actionable_widget['actions']:
-                value = self.form_expert.get_concrete_value(actionable_widget['label'])
+        actionable_widgets = [w for w in abstract_state.widgets if 'set' in w['actions']]
+        actionable_widgets = self.form_expert.get_concrete_values(actionable_widgets)
 
-                LOGGER.info("Filling form field {}: {}.".format(actionable_widget['key'], value))
+        for actionable_widget in actionable_widgets:
+            LOGGER.info("Filling form field {}: {}.".format(actionable_widget['key'], actionable_widget['value']))
 
-                ok = runner.perform_action(actionable_widget["selector"], 'set', value)
+            ok = runner.perform_action(actionable_widget["selector"], 'set', actionable_widget['value'])
 
-                if not ok:
-                    LOGGER.error(self._klass, "execute", "Unable to fill form field: " + actionable_widget['key'])
-                    return False
+            if not ok:
+                LOGGER.error(self._klass, "execute", "Unable to fill form field: " + actionable_widget['key'])
+                return False
         return True

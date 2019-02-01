@@ -1,0 +1,46 @@
+[
+  [
+	{
+		"label": "Recruiter",
+		"value": "Bruce Lee"
+	},
+	{
+		"label": "Hiring Manager",
+		"value": "Frank Castle"
+	},
+	{
+		"label": "Onboarding Owner",
+		"value": "Wade Wilson"
+	},
+	{
+		"label": "Recruiting Process",
+		"value": "US Sales"
+	}
+	,{
+		"label": "Approver",
+		"value": "Bruce Lee"
+	}
+  ],
+  [
+	{
+		"label": "Recruiter",
+		"value": "Peter Parker"
+	},
+	{
+		"label": "Hiring Manager",
+		"value": "The Punisher"
+	},
+	{
+		"label": "Onboarding Owner",
+		"value": "Bruce Banner"
+	},
+	{
+		"label": "Recruiting Process",
+		"value": "US Marketing"
+	}
+	,{
+		"label": "Approver",
+		"value": "Tony Stark"
+	}
+  ]
+]

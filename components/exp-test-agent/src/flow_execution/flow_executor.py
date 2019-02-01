@@ -20,7 +20,7 @@ class FlowExecutor:
         :param defect_rep: An instance of the DefectReporter class.
         """
 
-        self.aide = form_expert
+        self.form_expert = form_expert
         self.page_analyzer = page_analyzer
         self.state_abstracter = state_abstracter
         self.ext_labels = label_extracter
@@ -50,7 +50,7 @@ class FlowExecutor:
             widget = step[1]
 
             if action.action == 'TRY':
-                value = self.aide.get_concrete_inputs(action.component.ident,
+                value = self.form_expert.get_concrete_inputs(action.component.ident,
                                                       action.equivalence_class.equivalence_class)
 
                 ok = runner.perform_action(widget["selector"], "set", value)
