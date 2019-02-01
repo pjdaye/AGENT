@@ -126,7 +126,7 @@ class AgentLoop:
         page_analysis = self.page_analyzer.run_analysis(concrete_state)
         abstract_state = self.mapper.process(concrete_state)
 
-        LOGGER.info("Arrived at state: {}.".format(abstract_state.hash))
+        LOGGER.debug("Arrived at state: {}.".format(abstract_state.hash))
 
         self.label_extracter.extract_labels(abstract_state, page_analysis)
 
@@ -154,13 +154,13 @@ class AgentLoop:
         test_flow_queue = []
 
         for observation in observations:
-            LOGGER.info("Perceived: {}".format(str(observation)))
+            LOGGER.debug("Perceived: {}".format(str(observation)))
 
             """Generated test flows are also in natural language form."""
             generated_flow = self.flow_generator.generate_flow(str(observation))
 
             if generated_flow is not None and generated_flow is not False:
-                LOGGER.info("Generated flow: {}".format(generated_flow))
+                LOGGER.debug("Generated flow: {}".format(generated_flow))
 
                 """Parse the generated flow, constructing an AST leveraging our grammar."""
                 parsed_flow = self.seq_parser.parse(generated_flow)
@@ -206,7 +206,7 @@ class AgentLoop:
 
         if len(test_flow_queue) > 0:
 
-            LOGGER.info("No abstract tests on WORKER QUEUE. Executing first available abstract test.")
+            LOGGER.debug("No abstract tests on WORKER QUEUE. Executing first available abstract test.")
 
             is_ok = self.flow_executer.execute(abstract_state, self.runner, test_flow_queue[0])
 
@@ -226,7 +226,7 @@ class AgentLoop:
         self.memory.update_memory(abstract_state, chosen_widget)
 
         if len(chosen_widget["actions"]) == 0:
-            LOGGER.info("No actions found on widget: {}. Skipping.".format(chosen_widget["key"]))
+            LOGGER.debug("No actions found on widget: {}. Skipping.".format(chosen_widget["key"]))
             return
 
         action = random.choice(chosen_widget["actions"])

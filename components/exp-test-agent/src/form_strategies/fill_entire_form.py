@@ -29,7 +29,7 @@ class FillEntireForm:
         actionable_widgets = self.form_expert.get_concrete_values(actionable_widgets)
 
         for actionable_widget in actionable_widgets:
-            LOGGER.info("Filling form field {}: {}.".format(actionable_widget['key'], actionable_widget['value']))
+            LOGGER.debug("Filling form field {}: {}.".format(actionable_widget['key'], actionable_widget['value']))
 
             ok = runner.perform_action(actionable_widget["selector"], 'set', actionable_widget['value'])
 

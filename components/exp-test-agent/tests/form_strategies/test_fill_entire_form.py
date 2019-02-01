@@ -1,6 +1,6 @@
 from unittest.mock import Mock, patch
 import pytest
-from Clients.runner_client import RunnerClient
+from clients.runner_client import RunnerClient
 from abstraction.actionable_state import ActionableState
 from form_strategies.fill_entire_form import FillEntireForm
 
@@ -14,9 +14,17 @@ def runner():
 
 @pytest.fixture
 def form_expert():
-    form_expert_mock = Mock()
-    form_expert_mock.get_concrete_value.return_value = 'Guido'
-    return form_expert_mock
+
+    # noinspection PyMethodMayBeStatic
+    class FormExpertStub:
+        def get_concrete_values(self, widgets):
+            for widget in widgets:
+                widget['value'] = 'Guido'
+            return widgets
+
+    form_expert_stub = FormExpertStub()
+
+    return form_expert_stub
 
 
 def test_execute_form_fill_with_no_actionable_widgets_returns_true(runner, form_expert):

@@ -14,7 +14,7 @@ def get_neighbor(training_set, test_instance):
     min_distance = sys.maxsize
     for instance in training_set:
         dist = levenshtein_distance(test_instance, instance)
-        print('Distance******', test_instance, instance['features'], dist)
+        # print('Distance******', test_instance, instance['features'], dist)
         if dist == min_distance:
             nearest_neighbors.append(instance)
         elif dist < min_distance:
@@ -33,17 +33,17 @@ def fill_form(forms, form):
         unfilled_labels = []
         neighbor = get_neighbor(forms, labels)
         if not neighbor:
-            print('No neighbors found', labels)
+            # print('No neighbors found', labels)
             for label in labels:
                 new_form[form['form'][label]['id']] = None
             return new_form
-        print('neighbor', neighbor)
+        # print('neighbor', neighbor)
         for label in labels:
             if label in neighbor['form']:
                 new_form[form['form'][label]['id']] = neighbor['form'][label]['value']
             else:
                 unfilled_labels.append(label)
-        print('unfilled', unfilled_labels)
+        # print('unfilled', unfilled_labels)
         if len(labels) == len(unfilled_labels):
             for label in unfilled_labels:
                 new_form[form['form'][label]['id']] = None
@@ -169,7 +169,7 @@ def main():
         }
     }
 
-    print(fill_form(training, test))
+    # print(fill_form(training, test))
 
 
 if __name__ == '__main__':

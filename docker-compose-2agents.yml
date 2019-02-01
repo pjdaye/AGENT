@@ -25,6 +25,22 @@ services:
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
     ports:
       - "9003:9003"
+    healthcheck:
+      test: curl --fail -s http://localhost:9003/api/v1/health_check || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      - mongo
+
+  seeding:
+    build: ./seeding
+    environment:
+      - FORM_EXPERT_URL=http://form-expert:9003
+      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
+    depends_on:
+      form-expert:
+        condition: service_healthy
 
   flow-generator:
     build: ./components/flow-generator
@@ -38,6 +54,8 @@ services:
     image: jbrisbin/spring-petclinic
     ports:
       - "8080:8080"
+    logging:
+      driver: none
 
   gateway:
     build: ./components/gateway
@@ -72,11 +90,15 @@ services:
         - "CMD"
         - "rabbitmqctl"
         - "status"
+    logging:
+      driver: none
 
   mongo:
     image: mongo
     ports:
       - "27017:27017"
+    logging:
+      driver: none
 
   exp-test-agent-1:
     build: ./components/exp-test-agent
@@ -85,6 +107,7 @@ services:
       - RUNNER_URL=http://aeon-runner-1:8080
       - PAGE_ANALYSIS_URL=http://page-analyzer:9000
       - FLOW_GENERATION_URL=http://flow-generator:9001
+      - FORM_EXPERT_URL=http://form-expert:9003
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
     depends_on:
       rabbitmq:
@@ -97,6 +120,7 @@ services:
       - RUNNER_URL=http://aeon-runner-2:8080
       - PAGE_ANALYSIS_URL=http://page-analyzer:9000
       - FLOW_GENERATION_URL=http://flow-generator:9001
+      - FORM_EXPERT_URL=http://form-expert:9003
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
     depends_on:
       rabbitmq:

@@ -42,20 +42,20 @@ class FlowGeneratorClient:
 
         url = FlowGeneratorClient.FLOW_GEN_URL.format(self.SERVICE_URL)
 
-        LOGGER.info("Running flow generator: {}, {}".format(url, query))
+        LOGGER.debug("Running flow generator: {}, {}".format(url, query))
 
         query = [flow_step.lower() for flow_step in query.split(' ')]
         resp = requests.post(url, json=query, verify=False)
 
         if resp.status_code == 200:
-            LOGGER.info("Successfully ran flow generator.")
+            LOGGER.debug("Successfully ran flow generator.")
             resp = resp.json()
             sequences = resp['sequences']
             if len(sequences) > 0:
                 sequence = sequences[0]
                 expanded_sequence = " ".join(sequence).upper()
 
-                LOGGER.info("Generated flow: {}".format(expanded_sequence))
+                LOGGER.debug("Generated flow: {}".format(expanded_sequence))
 
                 if expanded_sequence is None:
                     return False
