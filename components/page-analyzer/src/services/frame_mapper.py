@@ -1,8 +1,18 @@
+"""Pre-processes a data frame for training purposes."""
 
 
 class FrameMapper:
+    """Pre-processes a data frame for training purposes."""
+
     @staticmethod
     def map_label_candidates(data_frame):
+        """ Performs label encoding and removes noisy columns for the label candidate classification problem.
+
+        :param data_frame: The data frame extracted using the ConcreteStateFeaturizer class.
+
+        :return: A data frame that is ready to be input into a training function.
+        """
+
         feature_mapping = {
             "Nearest_Color": {
                 "black": 0,
@@ -42,6 +52,13 @@ class FrameMapper:
 
     @staticmethod
     def map_page_titles(data_frame):
+        """ Performs label encoding and removes noisy columns for the page title classification problem.
+
+        :param data_frame: The data frame extracted using the ConcreteStateFeaturizer class.
+
+        :return: A data frame that is ready to be input into a training function.
+        """
+
         feature_mapping = {
             "Nearest_Color": {
                 "black": 0,

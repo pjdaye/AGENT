@@ -1,3 +1,6 @@
+"""The ConcreteStateFeaturizer class (responsible for extracting features from a concrete state)
+    and accompanying helper functions."""
+
 import math
 import re
 
@@ -38,6 +41,14 @@ basic_input_tags = ['input', 'textarea', 'select', 'option']
 
 
 def calc_color_distance(rgb1, rgb2):
+    """ Calculates the distance between two colors.
+
+    :param rgb1: The first color (a list with RGB components).
+    :param rgb2: The second color (a list with RGB components).
+
+    :return: The color distance.
+    """
+
     color1_rgb = sRGBColor(rgb1[0], rgb1[1], rgb1[2])
     color2_rgb = sRGBColor(rgb2[0], rgb2[1], rgb2[2])
 
@@ -49,14 +60,38 @@ def calc_color_distance(rgb1, rgb2):
 
 
 def calc_point_distance(x1, y1, x2, y2):
+    """ Calculates distance between two points.
+
+    :param x1: The X-coordinate for the first point.
+    :param y1: The Y-coordinate for the first point.
+    :param x2: The X-coordinate for the second point.
+    :param y2: The Y-coordinate for the second point.
+
+    :return: The point distance.
+    """
+
     return math.hypot(x2 - x1, y2 - y1)
 
 
 def sigmoid(x):
+    """ Applies the sigmoid function to the input.
+
+    :param x: The input number.
+
+    :return: The sigmoid of the input.
+    """
+
     return 1 / (1 + math.exp(-x))
 
 
 def get_nearest_color(color):
+    """ Retrieves the nearest color (from a list of pre-populated base colors) for the provided color.
+
+    :param color: The input color in CSS rgb notation (e.g. "rgb(255, 0, 0)")
+
+    :return: The nearest color.
+    """
+
     result = color_re.match(color)
     if result is not None and len(result.groups()) == 5:
         color_red = int(result.groups()[1])
@@ -80,6 +115,14 @@ def get_nearest_color(color):
 
 
 def normalize(df, excludes):
+    """ Normalizes a pandas data frame using feature scaling.
+
+    :param df: The input pandas data frame.
+    :param excludes: A list of columns to skip normalization on.
+
+    :return: A normalized copy of the input data frame.
+    """
+
     result = df.copy()
     for feature_name in df.columns:
         if feature_name in excludes:
@@ -98,9 +141,18 @@ def normalize(df, excludes):
 
 
 class ConcreteStateFeaturize:
+    """Extracts features from a given concrete state."""
 
     @staticmethod
     def convert_to_feature_frame(concrete_state, measure_color_distance=True):
+        """ Given a concrete state, constructs a normalized Pandas data frame with extracted features for each element.
+
+        :param concrete_state: The input concrete state.
+        :param measure_color_distance: A flag that controls whether color distance measurements should be done.
+
+        :return: A normalized Pandas data frame.
+        """
+
         data = []
 
         parent_map = {}

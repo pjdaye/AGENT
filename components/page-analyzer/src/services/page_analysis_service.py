@@ -1,3 +1,5 @@
+"""Handles web-page element classification and training requests."""
+
 import os
 
 import pandas as pd
@@ -19,7 +21,14 @@ PICKLER = ReadWritePickles()
 
 
 class PageAnalysisService:
+    """Handles web-page element classification and training requests."""
+
     def __init__(self, base_path=None):
+        """ Initializes the PageAnalysisService class.
+
+        :param base_path: An optionally provided base path from which to load pickled classifiers from.
+        """
+
         self.__featurize = ConcreteStateFeaturize()
         self.__frame_mapper = FrameMapper()
 
@@ -107,6 +116,13 @@ class PageAnalysisService:
             self.__commit_classifier = self.__commit_classifier_live
 
     def get_page_titles(self, concrete_state):
+        """ Run page title classifier for the provided concrete state.
+
+        :param concrete_state: The input concrete state.
+
+        :return: A page analysis containing keys for elements that were classified as page titles.
+        """
+
         data = {
             "pageTitles": []
         }
@@ -126,6 +142,13 @@ class PageAnalysisService:
         return data
 
     def get_page_analysis(self, concrete_state):
+        """ Run all element classifiers for the provided concrete state.
+
+        :param concrete_state: The input concrete state.
+
+        :return: A page analysis containing keys for elements that were classified.
+        """
+
         data = {
             "pageTitles": [],
             "labelCandidates": [],
@@ -181,6 +204,11 @@ class PageAnalysisService:
         return data
 
     def add_element(self, element):
+        """ Adds a labeled element to the underlying training data, and retrains the underlying classifiers.
+
+        :param element: The element payload (must also contain the associated concrete state).
+        """
+
         target_widget_key = element['id']
 
         concrete_state = element['state']
