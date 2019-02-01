@@ -93,7 +93,7 @@ def normalize(df, excludes):
             result[feature_name] = result[feature_name].apply(lambda x: round(abs(x), 4))
         except:
             LOGGER.error(f'Error normalizing feature: {feature_name}')
-            raise
+            raise RuntimeError(f'Error normalizing feature: {feature_name}')
     return result
 
 
