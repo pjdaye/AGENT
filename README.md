@@ -1,9 +1,41 @@
 # <img src="docs/images/superman.png" width="40" height="40"/> Agent 
 
 # Autonomous Website Exploration and Testing
-Agent, using training data from Agent-X, learns how to explore a website and evaluate its fields, forms, and functions. Agents, when not exploring, automatically apply abstract test flows, written in a standard grammar and learned by example, to determine if the site is operating in a consistent manner. Message queues and a coordinator support multiple distributed and concurrent Agents, thus enabling the rapid evaluation of new web applications.
+Agent, using training data from Agent-X, autonomously learns to explore a website and evaluate its actions, fields, and forms. Agents, apply abstract test flows, represented in a standard grammar, when not exploring. The executed test are capable of determining if a web page is operating in a manner consistent with learned test flow behaviors. Message queues and a coordinator support multiple distributed and concurrent agents operating on a system under test, thus enabling the rapid evaluation of new applications.
 
-## Documentation
+# Quickstart Guide 
+
+### Step 1: Clone this Agent repository
+```bash
+git clone ssh://git@ultigit.ultimatesoftware.com:7999/aist/agent.git
+cd agent
+```
+
+### Step 2: Start a local Docker Machine
+
+See https://docs.docker.com/machine/install-machine/ and https://docs.docker.com/machine/get-started/ for instructions on installing and starting a Docker Machine.
+
+### Step 3: Start the Agent Docker containers
+```bash
+docker-compose up -d
+```
+
+### Step 4: Open a terminal for viewing Agent logs
+```bash
+docker-compose logs -f
+```
+
+Note: The Agent system does not currently include a separate reporting capability. The Agent logs provide insight into the operation of the system's agents.
+
+
+### Step 5: Open viewport and start Agent
+1. Open index.html
+2. Point Agent to System Under Test (SUT) URL. This automatically defaults to the PetClinic application contained in the repository.
+2. Click on connect button to view Agent exploration and test of SUT.
+3. Click on start button to begin exploration and test.
+4. Click on stop button to stop exploration and test. Will stop 
+
+# Documentation
 * [Install](docs/install.md)
 * [Get started](docs/get_started.md)
 * [User Manual](docs/user_manual.md)

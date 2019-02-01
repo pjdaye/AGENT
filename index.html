@@ -1,10 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+    function start() {
+        var xhr = new XMLHttpRequest();
+        var sut_url = document.getElementById('SUT_URL');
+        xhr.open("POST", "http://localhost:9002/v1/start", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+               var json = JSON.parse(xhr.responseText);
+               console.log(json.email + ", " + json.password);
+            }
+        };
+        var data = JSON.stringify({"SUT_URL": sut_url});
+        xhr.send(data);
+    }
+
+    function stop() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost:9002/v1/stop", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+               var json = JSON.parse(xhr.responseText);
+               console.log(json.email + ", " + json.password);
+            }
+        };
+        var data = JSON.stringify({});
+        xhr.send(data);
+    }
+    </script>
+
+    <style type="text/css">
+        #vnc_frame {
+            position: relative;
+            width: 100%;
+            height: 800px }
+        #flower_frame {
+            position: relative;
+            width: 100%;
+            height: 400px  }
+    </style>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Agent</title>
 </head>
 <body>
+System Under Test URL: <input type="text" id="SUT_URL" value="http://pet-clinic:8080">
+
+<button onclick="start()">Start</button>
+
+<button onclick="stop()">Stop</button>
+
+<iframe src="http://localhost:8001/vnc.html" id="vnc_frame" scrolling="no" frameborder="0"></iframe>
+
+<iframe src="http://localhost:5555" id="flower_frame" scrolling="no" frameborder="0"></iframe>
+
+<form action="http://localhost:9002/v1/start" method="post">
+  System Under Test URL:<br>
+  <input type="text" name="SUT_URL" value="http://pet-clinic:8080">
+  <br><br>
+  <input type="submit" value="Submit">
+</form>
 
 </body>
 </html>
