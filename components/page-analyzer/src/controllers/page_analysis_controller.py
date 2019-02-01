@@ -9,9 +9,12 @@ LOGGER = get_logger('page_analysis_controller')
 
 
 class PageAnalysisController:
-    def __init__(self, app):
+    def __init__(self, app, service=None):
         self._app = app
-        self._service = PageAnalysisService()
+        if service is not None:
+            self._service = service
+        else:
+            self._service = PageAnalysisService()
 
     def add_routes(self):
         self._app.route('/v1/status', method="GET", callback=self.get_status)
@@ -20,7 +23,7 @@ class PageAnalysisController:
         self._app.route('/v1/pageAnalysis/state/add', method="POST", callback=self.add)
 
     @staticmethod
-    def get_status():
+    def get_status() -> bottle.HTTPResponse:
         return bottle.HTTPResponse(body={'status': 'OK'}, status=200)
 
     def page_analysis(self):

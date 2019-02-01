@@ -53,7 +53,7 @@ class FormExpertClient:
         response = requests.post(self.FILL_FORM_URL, json=payload, verify=False)
 
         if response.status_code is not 200:
-            raise EnvironmentError('Error retrieving data from form expert')
+            raise EnvironmentError('Error retrieving json from form expert')
 
         results = response.json()
 
@@ -84,7 +84,7 @@ class FormExpertClient:
             LOGGER.info("Form expert response: " + response.json()[label])
             return response.json()[label]
 
-        # Fall back to mock data
+        # Fall back to mock json
         value = self.fallback(label)
         LOGGER.info('Fallback generated: ' + value)
         return value

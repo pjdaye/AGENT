@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 
 from sklearn.ensemble import RandomForestClassifier
@@ -11,14 +13,13 @@ from aist_common.log import get_logger
 from aist_common.pickler import ReadWritePickles
 
 RUN_LIVE = True
-BASE_PATH = 'data'
+BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data'))
 LOGGER = get_logger('page_analysis_service')
 PICKLER = ReadWritePickles()
-PICKLER.base_path = BASE_PATH
 
 
 class PageAnalysisService:
-    def __init__(self):
+    def __init__(self, base_path=None):
         self.__featurize = ConcreteStateFeaturize()
         self.__frame_mapper = FrameMapper()
 
@@ -64,15 +65,21 @@ class PageAnalysisService:
             },
         }
 
-        self.__label_classifier_df = pd.read_csv(f'{BASE_PATH}/label_candidates_sys.csv')
+        # Test hook.
+        if base_path is None:
+            base_path = BASE_PATH
+
+        PICKLER.base_path = base_path
+
+        self.__label_classifier_df = pd.read_csv(f'{base_path}/label_candidates_sys.csv')
         self.__label_classifier_df.replace(self.feature_mapping, inplace=True)
         self.__label_classifier_df_orig = self.__label_classifier_df.copy(deep=True)
 
-        self.__error_msg_classifier_df = pd.read_csv(f'{BASE_PATH}/error_messages_sys.csv')
+        self.__error_msg_classifier_df = pd.read_csv(f'{base_path}/error_messages_sys.csv')
         self.__error_msg_classifier_df.replace(self.feature_mapping, inplace=True)
         self.__error_msg_classifier_df_orig = self.__error_msg_classifier_df.copy(deep=True)
 
-        self.__commit_classifier_df = pd.read_csv(f'{BASE_PATH}/commits_sys.csv')
+        self.__commit_classifier_df = pd.read_csv(f'{base_path}/commits_sys.csv')
         self.__commit_classifier_df.replace(self.feature_mapping, inplace=True)
         self.__commit_classifier_df_orig = self.__commit_classifier_df.copy(deep=True)
 
@@ -133,7 +140,7 @@ class PageAnalysisService:
         df_first = self.__frame_mapper.map_label_candidates(df)
         df_sec = self.__frame_mapper.map_page_titles(df)
 
-        LOGGER.info('Processing first')
+        LOGGER.info('Classifying label candidates.')
 
         for data_point in df_first.values:
             widget_key = data_point[0]
@@ -141,17 +148,10 @@ class PageAnalysisService:
                 continue
             data_point = data_point[1:].reshape(1, -1)
             pred = self.__label_classifier.predict(data_point)
-            if pred[0] == 1 and widget_key not in self.negativeStorage["labelCandidates"]:
-                LOGGER.debug(self.storage)
+            if pred[0] == 1:
                 data["labelCandidates"].append(widget_key)
 
-        LOGGER.info('Label candidates')
-
-        for labelCandidate in self.storage["labelCandidates"]:
-            if labelCandidate not in data["labelCandidates"]:
-                data["labelCandidates"].append(labelCandidate)
-
-        LOGGER.info('Reprocessing first')
+        LOGGER.info('Classifying other elements.')
 
         for data_point in df_first.values:
             widget_key = data_point[0]
@@ -160,20 +160,12 @@ class PageAnalysisService:
             data_point = data_point[1:].reshape(1, -1)
             pred = self.__error_msg_classifier.predict(data_point)
 
-            if pred[0] == 1 and widget_key not in data["labelCandidates"] and widget_key not in \
-                    self.negativeStorage["errorMessages"]:
+            if pred[0] == 1 and widget_key not in data["labelCandidates"]:
                 data["errorMessages"].append(widget_key)
 
             pred = self.__commit_classifier.predict(data_point)
-            if pred[0] == 1 and widget_key not in data["labelCandidates"] and widget_key not in \
-                    self.negativeStorage["errorMessages"]:
+            if pred[0] == 1 and widget_key not in data["labelCandidates"]:
                 data["commits"].append(widget_key)
-
-        LOGGER.info('Checking error messages')
-
-        for errorMessage in self.storage["errorMessages"]:
-            if errorMessage not in data["errorMessages"]:
-                data["errorMessages"].append(errorMessage)
 
         for data_point in df_sec.values:
             widget_key = data_point[0]
@@ -181,16 +173,10 @@ class PageAnalysisService:
                 continue
             data_point = data_point[1:].reshape(1, -1)
             pred = self.__page_title_classifier.predict(data_point)
-            if pred[0] == 1 and widget_key not in self.negativeStorage["pageTitles"]:
+            if pred[0] == 1:
                 data["pageTitles"].append(widget_key)
 
-        LOGGER.info('Processing titles')
-
-        for pageTitle in self.storage["pageTitles"]:
-            if pageTitle not in data["pageTitles"]:
-                data["pageTitles"].append(pageTitle)
-
-        LOGGER.info('Returning data')
+        LOGGER.info('Returning classifications.')
 
         return data
 

@@ -160,7 +160,7 @@ class TestConcreteStateFeaturize:
 
     def test_convert_to_feature_frame_single_widget(self):
         # Arrange.
-        with open('data/single_widget.json') as file:
+        with open('json/single_widget.json') as file:
             json_data = json.loads(file.read())
 
         # Act.
@@ -260,7 +260,7 @@ class TestConcreteStateFeaturize:
 
     def test_convert_to_feature_frame_without_color_measurements(self):
         # Arrange.
-        with open('data/single_widget.json') as file:
+        with open('json/single_widget.json') as file:
             json_data = json.loads(file.read())
 
         # Act.
@@ -360,7 +360,7 @@ class TestConcreteStateFeaturize:
 
     def test_convert_to_feature_frame_with_empty_for_attribute(self):
         # Arrange.
-        with open('data/empty_for_attribute.json') as file:
+        with open('json/empty_for_attribute.json') as file:
             json_data = json.loads(file.read())
 
         # Act.
@@ -382,7 +382,7 @@ class TestConcreteStateFeaturize:
 
     def test_convert_to_feature_frame_with_equal_min_max_during_normalize(self):
         # Arrange.
-        with open('data/min_equal_max_normalize.json') as file:
+        with open('json/min_equal_max_normalize.json') as file:
             json_data = json.loads(file.read())
 
         # Act.
@@ -419,7 +419,7 @@ class TestConcreteStateFeaturize:
 
     def test_convert_to_feature_frame(self):
         # Arrange.
-        with open('data/login_page.json') as file:
+        with open('json/login_page.json') as file:
             json_data = json.loads(file.read())
 
         # Act.

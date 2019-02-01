@@ -29,14 +29,14 @@ class RunnerClient:
         self.session = None
         self.aeon = get_session_factory()
 
-        with open(os.path.realpath('./data/stateScraper.js'), 'r') as file:
-            scrape_js = f'{file.read()} data=window.aist_scrape(); delete data.elements; return JSON.stringify(data);'
+        with open(os.path.realpath('./json/stateScraper.js'), 'r') as file:
+            scrape_js = f'{file.read()} json=window.aist_scrape(); delete json.elements; return JSON.stringify(json);'
             self.SCRAPE_SCRIPT = scrape_js.replace('\n', ' ')
 
-        with open(os.path.realpath('./data/installJQuery.js'), 'r') as file:
+        with open(os.path.realpath('./json/installJQuery.js'), 'r') as file:
             self.JQUERY_SCRIPT = file.read().replace('\n', ' ')
 
-        with open(os.path.realpath('./data/checkReadyState.js'), 'r') as file:
+        with open(os.path.realpath('./json/checkReadyState.js'), 'r') as file:
             self.CHECK_READY_SCRIPT = file.read().replace('\n', ' ')
 
     def launch(self, url):
@@ -144,9 +144,9 @@ class RunnerClient:
                 LOGGER.error(f'Failed to scrape concrete state: {resp["failureMessage"]}')
                 return False
 
-            if resp['data'].endswith('.xml') or resp['data'].endswith('.json'):
+            if resp['json'].endswith('.xml') or resp['json'].endswith('.json'):
                 LOGGER.info("Successfully collected concrete state.")
-                return self._get_empty_concrete_state(resp['data'], resp['data'])
+                return self._get_empty_concrete_state(resp['json'], resp['json'])
 
             resp = self.session.execute_command('ExecuteScriptCommand', [self.HAS_JQUERY_SCRIPT])
 
@@ -154,7 +154,7 @@ class RunnerClient:
                 LOGGER.error(f'Failed to scrape concrete state: {resp["failureMessage"]}')
                 return False
 
-            has_jquery = resp['data'] == 'true'
+            has_jquery = resp['json'] == 'true'
 
             if not has_jquery:
                 resp = self.session.execute_command('ExecuteAsyncScriptCommand', [self.JQUERY_SCRIPT])
@@ -181,7 +181,7 @@ class RunnerClient:
                 LOGGER.error(f'Failed to scrape concrete state: {resp["failureMessage"]}')
                 return False
 
-            state_json = json.loads(resp['data'])
+            state_json = json.loads(resp['json'])
             LOGGER.info("Successfully collected concrete state.")
             return state_json
 
@@ -223,7 +223,7 @@ class RunnerClient:
                 LOGGER.error(f'Failed to wait for DOM ready state: {resp["failureMessage"]}')
                 return False
 
-            dom_loaded = resp['data'] == 'true'
+            dom_loaded = resp['json'] == 'true'
 
             if dom_loaded:
                 break

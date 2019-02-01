@@ -12,7 +12,7 @@ LOGGER = get_logger('test-generator-service')
 
 class TestGeneratorService:
     def __init__(self):
-        with open('data/embedding.json') as f:
+        with open('json/embedding.json') as f:
             data = json.load(f)
             self.char_indices = data['char_indices']
             self.indices_char = data['indices_char']
@@ -20,7 +20,7 @@ class TestGeneratorService:
         self.maxlen = 11
         self.chars = self.char_indices.values()
 
-        self.model = load_model('data/lstm.h5')
+        self.model = load_model('json/lstm.h5')
 
         # noinspection PyProtectedMember
         self.model._make_predict_function()
