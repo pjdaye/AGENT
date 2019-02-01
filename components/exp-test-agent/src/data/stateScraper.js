@@ -412,7 +412,7 @@ function addWidget(data, element_node, isText) {
 
     data.elements[parentID] = parent;
     data.elements[id] = element;
-    element.data("widget-json", id);
+    element.data("widget-data", id);
 
     return element;
 }
