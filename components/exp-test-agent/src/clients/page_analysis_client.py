@@ -46,7 +46,7 @@ class PageAnalysisClient:
 
         resp = requests.post(url, json=concrete_state, verify=False)
         if resp.status_code == 200:
-            LOGGER.info("Successfully ran page analysis.")
+            LOGGER.debug("Successfully ran page analysis.")
             resp = resp.json()
 
             page_titles = len(resp['analysis']['pageTitles'])
@@ -60,11 +60,11 @@ class PageAnalysisClient:
             resp['analysis']['CANCEL'] = resp['analysis']['cancels']
 
             if page_titles > 0:
-                LOGGER.info("Perceived {} page titles.".format(page_titles))
+                LOGGER.debug("Perceived {} page titles.".format(page_titles))
             if label_candidates > 0:
-                LOGGER.info("Perceived {} label candidates.".format(label_candidates))
+                LOGGER.debug("Perceived {} label candidates.".format(label_candidates))
             if error_messages > 0:
-                LOGGER.info("Perceived {} error messages.".format(error_messages))
+                LOGGER.debug("Perceived {} error messages.".format(error_messages))
             return resp
         else:
             LOGGER.error("Unable to run page analysis.")

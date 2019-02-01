@@ -12,6 +12,7 @@ class TestPageAnalysisController:
             def __init__(self):
                 self.routes = []
 
+            # noinspection PyUnusedLocal
             def route(self, route, method, callback):
                 self.routes.append((route, method))
 

@@ -1,5 +1,13 @@
+"""Pretty-prints a confusion matrix."""
+
 
 def print_cm(cm, labels):
+    """ Pretty-prints a confusion matrix.
+
+    :param cm: The confusion matrix.
+    :param labels: A list of labels to map classification indices to human-readable labels.
+    """
+
     print("Confusion Matrix")
 
     column_width = max([len(x) for x in labels] + [5])  # 5 is value length
