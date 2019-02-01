@@ -47,9 +47,6 @@ services:
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
     ports:
       - "9002:9002"
-    depends_on:
-      exp-test-agent:
-        condition: service_started
 
   flower:
     build: ./deployment/flower
@@ -70,7 +67,7 @@ services:
     healthcheck:
       timeout: 5s
       interval: 5s
-      retries: 5
+      retries: 10
       test:
         - "CMD"
         - "rabbitmqctl"

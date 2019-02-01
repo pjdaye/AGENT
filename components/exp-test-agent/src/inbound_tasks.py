@@ -1,3 +1,5 @@
+"""Contains all inbound Celery tasks."""
+
 import os
 import jsonpickle
 
@@ -16,6 +18,12 @@ app = create_app([])
 
 @app.task(name='test_agent.start_session', queue="agent_broadcast_tasks")
 def start_session(session_start_data):
+    """ A Celery task that starts an agent session.
+
+    :param session_start_data: The request payload.
+    :return: True if the agent started successfully.
+    """
+
     LOGGER.info("Starting session.")
 
     sut_url = session_start_data['SUT_URL']
@@ -27,13 +35,35 @@ def start_session(session_start_data):
 
     runner_url = os.environ['RUNNER_URL']
 
+    general_memory['SESSION_STOPPED'] = False
+
     AgentLoop(sut_url, runner_url).start()
+
+    return True
+
+
+@app.task(name='test_agent.stop_session', queue="agent_broadcast_tasks")
+def stop_session():
+    """ A Celery task that stops all agent sessions.
+
+    :return: True if the agent received the stop request successfully.
+    """
+
+    LOGGER.info("Stopping session.")
+
+    general_memory['SESSION_STOPPED'] = True
 
     return True
 
 
 @app.task(name='test_agent.handle_planned_flow', queue="test_agent_queue")
 def handle_planned_flow(flow_data):
+    """ A Celery task that handles a queued planned concrete test flow (received from the Coordinator Agent).
+
+    :param flow_data: The concrete test flow payload.
+    :return: True if the concrete test flow was successfully received and internally enqueued.
+    """
+
     planned_flow = jsonpickle.decode(flow_data)
     planned_hash = planned_flow.hash
 
@@ -49,8 +79,6 @@ def handle_planned_flow(flow_data):
 
     for key, val in celery_memory.items():
         LOGGER.info(f'State: {str(key)}, |Queue|: {str(len(val))}')
-
-    print()
 
     memory_lock.release()
 

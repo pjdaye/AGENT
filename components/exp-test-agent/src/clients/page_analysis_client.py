@@ -1,3 +1,4 @@
+"""A client that communicates with and provides the capabilities of the page analysis service."""
 import os
 
 import requests
@@ -11,19 +12,34 @@ LOGGER = get_logger('page-analysis-client')
 
 
 class PageAnalysisClient:
+    """A client that communicates with and provides the capabilities of the page analysis service."""
 
     ANALYSIS_RUN_URL = "{}/v1/pageAnalysis/state/concrete"
 
     def __init__(self):
+        """ Initializes the PageAnalysisClient class.
+        """
+
         self._klass = "PageAnalysisClient"
         self._set_envs()
 
     def _set_envs(self):
+        """ Loads environment variables.
+        """
+
         self.SERVICE_URL = 'http://page-analyzer'
         if 'PAGE_ANALYSIS_URL' in os.environ:
             self.SERVICE_URL = os.environ['PAGE_ANALYSIS_URL']
 
     def run_analysis(self, concrete_state):
+        """ Communicates with the page analysis service to run machine learning classifiers
+            on the current concrete state for the purpose of element classification.
+
+        :param concrete_state: The concrete state to run analysis on.
+
+        :return: Classified elements.
+        """
+
         url = PageAnalysisClient.ANALYSIS_RUN_URL.format(self.SERVICE_URL)
 
         LOGGER.info("Running page analysis: {}".format(url))

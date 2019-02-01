@@ -1,3 +1,4 @@
+"""A client that communicates with and provides the capabilities of the flow generation service."""
 import os
 
 import requests
@@ -11,19 +12,34 @@ LOGGER = get_logger('flow-generator-client')
 
 
 class FlowGeneratorClient:
+    """A client that communicates with and provides the capabilities of the flow generation service."""
 
     FLOW_GEN_URL = "{}/v1/predict"
 
     def __init__(self):
+        """ Initializes the FlowGeneratorClient class.
+        """
+
         self._klass = "FlowGeneratorClient"
         self._set_envs()
 
     def _set_envs(self):
+        """ Loads environment variables.
+        """
+
         self.SERVICE_URL = 'http://flow-generator'
         if 'FLOW_GENERATION_URL' in os.environ:
             self.SERVICE_URL = os.environ['FLOW_GENERATION_URL']
 
     def generate_flow(self, query):
+        """ Communicates with the flow generation service to generate an
+            abstract test flow given a precondition.
+
+        :param query: A precondition (e.g. Observe TextBox FirstName).
+
+        :return: A generated abstract test flow.
+        """
+
         url = FlowGeneratorClient.FLOW_GEN_URL.format(self.SERVICE_URL)
 
         LOGGER.info("Running flow generator: {}, {}".format(url, query))

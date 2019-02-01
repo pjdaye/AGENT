@@ -1,21 +1,29 @@
+"""Extracts labels for each actionable widget in an abstract state."""
+
 import math
 
 
 class LabelExtraction:
-    def __init__(self):
-        pass
+    """Extracts labels for each actionable widget in an abstract state."""
 
     @staticmethod
-    def extract_labels(act_state, page_analysis):
+    def extract_labels(abstract_state, page_analysis):
+        """ Extracts labels for each actionable widget in the given abstract state.
+            Relies on element classifications present in the provided page analysis to determine label candidates.
+
+        :param abstract_state: The abstract state to process.
+        :param page_analysis: The page analysis output for the provided abstract state (element classifications).
+        """
+
         label_candidates = page_analysis['analysis']['labelCandidates']
-        for widget in act_state.widgets:
+        for widget in abstract_state.widgets:
             best_label = None
             best_label_key = None
             best_distance = 99999
             widget_x = widget["properties"]["x"]
             widget_y = widget["properties"]["y"]
-            for static_widget in act_state.static_widgets:
-                should_skip = LabelExtraction.should_skip(static_widget)
+            for static_widget in abstract_state.static_widgets:
+                should_skip = LabelExtraction._should_skip(static_widget)
                 if should_skip:
                     continue
                 if static_widget['key'] not in label_candidates:
@@ -36,7 +44,14 @@ class LabelExtraction:
             widget["label_key"] = best_label_key
 
     @staticmethod
-    def should_skip(widget):
+    def _should_skip(widget):
+        """ Determines whether a widget should be skipped when determining if it is a label.
+            Generally, we want to skip headers, and other form fields to prevent other fields being assigned as labels.
+
+        :param widget: A widget on an abstract state.
+        :return: True if the widget should be skipped.
+        """
+
         tag = widget["properties"]["tagName"]
         if tag in ['BUTTON', 'INPUT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6']:
             return True

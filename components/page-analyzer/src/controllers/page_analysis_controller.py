@@ -1,12 +1,9 @@
 import json
-from http import HTTPStatus
 
 import bottle
-from bottle import request
-
-from services.page_analysis_service import PageAnalysisService
-
 from aist_common.log import get_logger
+from bottle import request
+from services.page_analysis_service import PageAnalysisService
 
 LOGGER = get_logger('page_analysis_controller')
 

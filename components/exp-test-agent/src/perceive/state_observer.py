@@ -1,3 +1,5 @@
+"""Responsible for extracting observations from an abstract state."""
+
 from aist_common.grammar.component.component import Component
 from aist_common.grammar.element_class.dropdown import Dropdown
 from aist_common.grammar.element_class.error_message import ErrorMessage
@@ -7,17 +9,30 @@ from aist_common.grammar.qualifier_classifier import QualifierClassifier
 
 
 class StateObserver:
-    def __init__(self):
-        self.qualifier_classifier = QualifierClassifier()
-        pass
+    """Responsible for extracting observations from an abstract state."""
 
-    def perceive(self, act_state, page_analysis):
+    def __init__(self):
+        """ Initializes the StateObserver class.
+        """
+
+        self.qualifier_classifier = QualifierClassifier()
+
+    def perceive(self, abstract_state, page_analysis):
+        """ Extracts observations from a given abstract state in the form of grammar ASTs.
+            Relies on element classifications present in the provided page analysis to qualify elements.
+
+        :param abstract_state: The abstract state to process.
+        :param page_analysis: The page analysis output for the provided abstract state (element classifications).
+
+        :return: A list of observations, each an instance of our grammar's Observation class.
+        """
+
         observations = []
 
         label_candidates = page_analysis['analysis']['labelCandidates']
         error_messages = page_analysis['analysis']['errorMessages']
 
-        for widget in act_state.widgets:
+        for widget in abstract_state.widgets:
             widget_label = widget['label']
             widget_label_key = widget['label_key']
 
@@ -51,6 +66,13 @@ class StateObserver:
 
     @staticmethod
     def get_element_class(widget, error_messages):
+        """ Maps a widget to an element class (e.g. Textbox, Dropdown, ErrorMessage).
+
+        :param widget: The abstract widget to map.
+        :param error_messages: The list of error messages present on the abstract state being processed.
+        :return: The element class for the provided widget.
+        """
+
         widget_tag = widget['properties']['tagName']
         if widget_tag == 'INPUT':
             return Textbox()
@@ -59,7 +81,3 @@ class StateObserver:
         elif widget['key'] in error_messages:
             return ErrorMessage()
         return None
-
-
-
-

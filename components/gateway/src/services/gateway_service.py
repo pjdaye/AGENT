@@ -22,3 +22,16 @@ class GatewayService:
 
         start_agent_session.delay(request)
         return {'session': session_id}
+
+    @staticmethod
+    def stop_session():
+        app = create_app([])
+
+        @app.task(name='test_agent.stop_session', queue="agent_broadcast_tasks")
+        def stop_agent_session():
+            pass
+
+        LOGGER.info(f'Signaling agents to stop exploration.')
+
+        stop_agent_session.delay()
+        return {'stopped': True}
