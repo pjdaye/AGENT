@@ -20,10 +20,10 @@ def coordinator_handle_planned_flow(flow_data):
     msg = "Received abstract test on COORDINATOR QUEUE:"
 
     if planned_hash in processed_tests:
-        LOGGER.info(f'{msg} ({str(planned_hash)}) {str(planned_flow.original_flow)}. (DUPLICATE)')
+        LOGGER.debug(f'{msg} ({str(planned_hash)}) {str(planned_flow.original_flow)}. (DUPLICATE)')
     else:
-        LOGGER.info(f'{msg} ({str(planned_hash)}) {str(planned_flow.original_flow)}. (NEW)')
-        LOGGER.info('Publishing to round-robin WORKER QUEUE.')
+        LOGGER.debug(f'{msg} ({str(planned_hash)}) {str(planned_flow.original_flow)}. (NEW)')
+        LOGGER.info('Received abstract test. Publishing to round-robin WORKER QUEUE.')
 
         AgentFlowPublisher.publish(flow_data)
         processed_tests.add(planned_hash)

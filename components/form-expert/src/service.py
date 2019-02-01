@@ -60,14 +60,14 @@ form: [{
 """
 @post('/api/v1/fill_form')
 def fill_form_endpoint():
-    print('BODY: ', request.body)
+    # print('BODY: ', request.body)
     form = json.load(request.body)
     client = MongoClient(MONGO_HOST)
     db = client.get_database(MONGO_DATABASE)
     form = transform_form(form)
     forms = db.forms.find({})
     form = fill_form(forms, form)
-    print('FINAL', form)
+    # print('FINAL', form)
     response.content_type = 'application/json'
     return json.dumps(form)
 
@@ -106,7 +106,7 @@ def transform_form(form):
 def save_form(db, form):
     forms = db.forms
     result = forms.insert_one(form)
-    print('SAVED', form)
+    # print('SAVED', form)
     return str(result.inserted_id)
 
 

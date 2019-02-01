@@ -60,7 +60,7 @@ class PageAnalysisController:
 
         results["analysis"] = analysis
 
-        LOGGER.info('Results built...')
+        LOGGER.debug('Results built...')
 
         return bottle.HTTPResponse(body=results, status=200)
 

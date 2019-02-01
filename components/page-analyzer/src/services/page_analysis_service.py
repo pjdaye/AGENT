@@ -157,13 +157,13 @@ class PageAnalysisService:
             "cancels": []
         }
 
-        LOGGER.info('Setting up dataframes')
+        LOGGER.debug('Setting up dataframes')
 
         df = self.__featurize.convert_to_feature_frame(concrete_state)
         df_first = self.__frame_mapper.map_label_candidates(df)
         df_sec = self.__frame_mapper.map_page_titles(df)
 
-        LOGGER.info('Classifying label candidates.')
+        LOGGER.debug('Classifying label candidates.')
 
         for data_point in df_first.values:
             widget_key = data_point[0]
@@ -174,7 +174,7 @@ class PageAnalysisService:
             if pred[0] == 1:
                 data["labelCandidates"].append(widget_key)
 
-        LOGGER.info('Classifying other elements.')
+        LOGGER.debug('Classifying other elements.')
 
         for data_point in df_first.values:
             widget_key = data_point[0]

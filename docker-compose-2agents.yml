@@ -54,6 +54,8 @@ services:
     image: jbrisbin/spring-petclinic
     ports:
       - "8080:8080"
+    logging:
+      driver: none
 
   gateway:
     build: ./components/gateway
@@ -88,13 +90,15 @@ services:
         - "CMD"
         - "rabbitmqctl"
         - "status"
+    logging:
+      driver: none
 
   mongo:
     image: mongo
     ports:
       - "27017:27017"
-    volumes:
-      - data/form-expert
+    logging:
+      driver: none
 
   exp-test-agent-1:
     build: ./components/exp-test-agent

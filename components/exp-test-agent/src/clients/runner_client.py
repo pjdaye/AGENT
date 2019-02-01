@@ -145,7 +145,7 @@ class RunnerClient:
                 return False
 
             if resp['data'].endswith('.xml') or resp['data'].endswith('.json'):
-                LOGGER.info("Successfully collected concrete state.")
+                LOGGER.debug("Successfully collected concrete state.")
                 return self._get_empty_concrete_state(resp['data'], resp['data'])
 
             resp = self.session.execute_command('ExecuteScriptCommand', [self.HAS_JQUERY_SCRIPT])
@@ -182,7 +182,7 @@ class RunnerClient:
                 return False
 
             state_json = json.loads(resp['data'])
-            LOGGER.info("Successfully collected concrete state.")
+            LOGGER.debug("Successfully collected concrete state.")
             return state_json
 
         except AeonSessionError:

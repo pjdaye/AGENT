@@ -59,7 +59,7 @@ class FlowExecutor:
                     LOGGER.error("Unable to execute flow act step: " + str(action))
                     return False
 
-                LOGGER.info("Successfully executed flow act step: " + str(action))
+                LOGGER.debug("Successfully executed flow act step: " + str(action))
 
             elif action.action == 'CLICK':
                 ok = runner.perform_action(widget["selector"], "click", None)
@@ -68,7 +68,7 @@ class FlowExecutor:
                     LOGGER.error("Unable to execute flow act step: " + str(action))
                     return False
 
-                LOGGER.info("Successfully executed flow act step: " + str(action))
+                LOGGER.debug("Successfully executed flow act step: " + str(action))
 
         concrete_state = runner.concrete_state()
 
