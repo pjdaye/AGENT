@@ -3,18 +3,38 @@ import sys
 
 from Levenshtein import seqratio
 
+from aist_common.log import get_logger
+
+LOGGER = get_logger('classifier')
+
 
 def levenshtein_distance(a, b):
+    """ calculates the Levenshtein distance of two instances
+
+    :param a: The first instance to compare.
+    :param b: The second instance to compare.
+
+    :return: The Levenshtein distance of the two instances.
+    """
+
     ratio = seqratio(a, b['features'])
     return 1 - ratio
 
 
 def get_neighbor(training_set, test_instance):
+    """ Returns a nearest neighbor out of a given set. If there are multiple neighbors
+    with the same smallest distance, one is chosen randomly.
+
+    :param training_set: The set of instances to choose from.
+    :param test_instance: The instance to which a nearest neighbor should be found.
+
+    :return: A randomly chosen nearest neighbor of the given instance.
+    """
+
     nearest_neighbors = []
     min_distance = sys.maxsize
     for instance in training_set:
         dist = levenshtein_distance(test_instance, instance)
-        # print('Distance******', test_instance, instance['features'], dist)
         if dist == min_distance:
             nearest_neighbors.append(instance)
         elif dist < min_distance:
@@ -33,17 +53,17 @@ def fill_form(forms, form):
         unfilled_labels = []
         neighbor = get_neighbor(forms, labels)
         if not neighbor:
-            # print('No neighbors found', labels)
+            LOGGER.info('No neighbors found', labels)
             for label in labels:
                 new_form[form['form'][label]['id']] = None
             return new_form
-        # print('neighbor', neighbor)
+        LOGGER.info('Neighbor', neighbor)
         for label in labels:
             if label in neighbor['form']:
                 new_form[form['form'][label]['id']] = neighbor['form'][label]['value']
             else:
                 unfilled_labels.append(label)
-        # print('unfilled', unfilled_labels)
+        LOGGER.info('unfilled', unfilled_labels)
         if len(labels) == len(unfilled_labels):
             for label in unfilled_labels:
                 new_form[form['form'][label]['id']] = None
@@ -168,8 +188,6 @@ def main():
             'jim': {'id': 'test3'}
         }
     }
-
-    # print(fill_form(training, test))
 
 
 if __name__ == '__main__':

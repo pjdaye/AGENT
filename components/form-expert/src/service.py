@@ -20,13 +20,6 @@ MONGO_DATABASE = os.environ['FORM_EXPERT_DATABASE'] \
 app = bottle.app()
 
 
-"""
-[{
-    "label": "city",
-    "element": "input-text",
-    "value": "hello",
-}]
-"""
 @post('/api/v1/form')
 def form_example():
     form = json.load(request.body)
@@ -36,54 +29,23 @@ def form_example():
     response.content_type = 'application/json'
     return json.dumps({'form_id': save_form(db, form)})
 
-"""
-id: 2084024gj2ogj,
-form: [{
-    "label": "city",
-    "element": "input-text",
-    "value": "hello",
-}]
 
-{
-    _id: 2049g204g90a,
-    label: "city",
-    values: "Weston", "Miami"
-}
-"""
-
-"""
-[
-    {
-        "label": "city",
-    }
-]
-"""
 @post('/api/v1/fill_form')
 def fill_form_endpoint():
-    # print('BODY: ', request.body)
     form = json.load(request.body)
     client = MongoClient(MONGO_HOST)
     db = client.get_database(MONGO_DATABASE)
     form = transform_form(form)
     forms = db.forms.find({})
     form = fill_form(forms, form)
-    # print('FINAL', form)
     response.content_type = 'application/json'
     return json.dumps(form)
-
-"""
-{
-    "city": {
-        "label": "city",
-        "value": "Weston"
-    }
-}
-"""
 
 
 @get('/api/v1/health_check')
 def health_check():
     return json.dumps({'healthy': True})
+
 
 def transform_form(form):
     features = []
@@ -106,7 +68,6 @@ def transform_form(form):
 def save_form(db, form):
     forms = db.forms
     result = forms.insert_one(form)
-    # print('SAVED', form)
     return str(result.inserted_id)
 
 
