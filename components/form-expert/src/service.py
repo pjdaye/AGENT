@@ -22,6 +22,11 @@ app = bottle.app()
 
 @post('/api/v1/form')
 def form_example():
+    """Stores training data from a given form to the database.
+
+    :return: The response payload containing the generated ID of the given form.
+    """
+
     form = json.load(request.body)
     client = MongoClient(MONGO_HOST)
     db = client.get_database(MONGO_DATABASE)
@@ -32,6 +37,11 @@ def form_example():
 
 @post('/api/v1/fill_form')
 def fill_form_endpoint():
+    """Fills a given form using the stored forms in the database.
+
+    :return: A mapping from form element IDs to suggested values for the form.
+    """
+
     form = json.load(request.body)
     client = MongoClient(MONGO_HOST)
     db = client.get_database(MONGO_DATABASE)
@@ -44,10 +54,20 @@ def fill_form_endpoint():
 
 @get('/api/v1/health_check')
 def health_check():
+    """Health check endpoint of the form expert.
+
+    :return: Returns a flag called 'healthy' which is set to True.
+    """
+
     return json.dumps({'healthy': True})
 
 
 def transform_form(form):
+    """Generalizes the labels of a form and extracts the labels as unique features.
+
+    :param form: The form to transform.
+    :return: The transformed form.
+    """
     features = []
     form_dict = {}
     for field in form:
@@ -66,6 +86,13 @@ def transform_form(form):
 
 
 def save_form(db, form):
+    """Saves a form to the database.
+
+    :param db: The database to store the form in.
+    :param form: The form to store.
+    :return: The generated ID of the form.
+    """
+
     forms = db.forms
     result = forms.insert_one(form)
     return str(result.inserted_id)

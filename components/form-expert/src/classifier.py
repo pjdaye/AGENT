@@ -44,6 +44,13 @@ def get_neighbor(training_set, test_instance):
 
 
 def fill_form(forms, form):
+    """Fills a given form given a set or known forms.
+
+    :param forms: A set of known forms.
+    :param form: The form to fill.
+    :return: A mapping from form element IDs to suggested values for the form.
+    """
+
     forms = list(forms)
     new_form = {}
 
