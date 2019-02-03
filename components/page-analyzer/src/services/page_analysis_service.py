@@ -1,5 +1,5 @@
 """Handles web-page element classification and training requests."""
-
+import csv
 import os
 
 import pandas as pd
@@ -32,17 +32,6 @@ class PageAnalysisService:
         self.__featurize = ConcreteStateFeaturize()
         self.__frame_mapper = FrameMapper()
 
-        self.storage = {
-            "labelCandidates": [],
-            "errorMessages": [],
-            "pageTitles": []
-        }
-        self.negativeStorage = {
-            "labelCandidates": [],
-            "errorMessages": [],
-            "pageTitles": []
-        }
-
         self.feature_mapping = {
             "Nearest_Color": {
                 "black": 0,
@@ -74,46 +63,64 @@ class PageAnalysisService:
             },
         }
 
+        self.base_path = base_path
+
         # Test hook.
-        if base_path is None:
-            base_path = BASE_PATH
+        if self.base_path is None:
+            self.base_path = BASE_PATH
 
-        PICKLER.base_path = base_path
+        PICKLER.base_path = self.base_path
 
-        self.__label_classifier_df = pd.read_csv(f'{base_path}/label_candidates_sys.csv')
-        self.__label_classifier_df.replace(self.feature_mapping, inplace=True)
-        self.__label_classifier_df_orig = self.__label_classifier_df.copy(deep=True)
+        self.__label_classifier_df = None
+        self.__error_msg_classifier_df = None
+        self.__commit_classifier_df = None
+        self.__label_classifier = None
+        self.__error_msg_classifier = None
+        self.__commit_classifier = None
+        self.__page_title_classifier = None
+        self.__label_classifier_live = None
+        self.__error_msg_classifier_live = None
+        self.__commit_classifier_live = None
 
-        self.__error_msg_classifier_df = pd.read_csv(f'{base_path}/error_messages_sys.csv')
-        self.__error_msg_classifier_df.replace(self.feature_mapping, inplace=True)
-        self.__error_msg_classifier_df_orig = self.__error_msg_classifier_df.copy(deep=True)
+        self._load_classifiers()
 
-        self.__commit_classifier_df = pd.read_csv(f'{base_path}/commits_sys.csv')
-        self.__commit_classifier_df.replace(self.feature_mapping, inplace=True)
-        self.__commit_classifier_df_orig = self.__commit_classifier_df.copy(deep=True)
+    def _load_classifiers(self):
+        self.__label_classifier_df = pd.read_csv(f'{self.base_path}/label_candidates_sys.csv')
+
+        self.__error_msg_classifier_df = pd.read_csv(f'{self.base_path}/error_messages_sys.csv')
+
+        self.__commit_classifier_df = pd.read_csv(f'{self.base_path}/commits_sys.csv')
 
         # Load system-delivered classifiers.
-
         self.__label_classifier = PICKLER.read('label_candidates.clf')
-
         self.__error_msg_classifier = PICKLER.read('error_messages.clf')
-
         self.__commit_classifier = PICKLER.read('commits.clf')
-
         self.__page_title_classifier = PICKLER.read('page_titles.clf')
 
         # Load live, trainable classifiers.
-
         self.__label_classifier_live = PICKLER.read('label_candidates_live.clf')
-
         self.__error_msg_classifier_live = PICKLER.read('error_messages_live.clf')
-
         self.__commit_classifier_live = PICKLER.read('commits_live.clf')
 
         if RUN_LIVE:
+            if os.path.isfile(f'{self.base_path}/label_candidates_sys_live.csv'):
+                self.__label_classifier_df = pd.read_csv(f'{self.base_path}/label_candidates_sys_live.csv')
+
             self.__label_classifier = self.__label_classifier_live
+
+            if os.path.isfile(f'{self.base_path}/error_messages_sys_live.csv'):
+                self.__error_msg_classifier_df = pd.read_csv(f'{self.base_path}/error_messages_sys_live.csv')
+
             self.__error_msg_classifier = self.__error_msg_classifier_live
+
+            if os.path.isfile(f'{self.base_path}/commits_sys_live.csv'):
+                self.__commit_classifier_df = pd.read_csv(f'{self.base_path}/commits_sys_live.csv')
+
             self.__commit_classifier = self.__commit_classifier_live
+
+        self.__label_classifier_df.replace(self.feature_mapping, inplace=True)
+        self.__error_msg_classifier_df.replace(self.feature_mapping, inplace=True)
+        self.__commit_classifier_df.replace(self.feature_mapping, inplace=True)
 
     def get_page_titles(self, concrete_state):
         """ Run page title classifier for the provided concrete state.
@@ -126,6 +133,8 @@ class PageAnalysisService:
         data = {
             "pageTitles": []
         }
+
+        self._load_classifiers()
 
         df = self.__featurize.convert_to_feature_frame(concrete_state, measure_color_distance=False)
         df = self.__frame_mapper.map_page_titles(df)
@@ -157,10 +166,12 @@ class PageAnalysisService:
             "cancels": []
         }
 
+        self._load_classifiers()
+
         LOGGER.debug('Setting up dataframes')
 
         df = self.__featurize.convert_to_feature_frame(concrete_state)
-        df_first = self.__frame_mapper.map_label_candidates(df)
+        df_first, _ = self.__frame_mapper.map_label_candidates(df)
         df_sec = self.__frame_mapper.map_page_titles(df)
 
         LOGGER.debug('Classifying label candidates.')
@@ -209,6 +220,8 @@ class PageAnalysisService:
         :param element: The element payload (must also contain the associated concrete state).
         """
 
+        self._load_classifiers()
+
         target_widget_key = element['id']
 
         concrete_state = element['state']
@@ -217,7 +230,7 @@ class PageAnalysisService:
 
         df = self.__featurize.convert_to_feature_frame(concrete_state)
 
-        df_first = self.__frame_mapper.map_label_candidates(df)
+        df_first, df_first_before_encoding = self.__frame_mapper.map_label_candidates(df)
 
         df_in_use = self.__label_classifier_df
 
@@ -226,14 +239,20 @@ class PageAnalysisService:
         elif element_class == 'commit':
             df_in_use = self.__commit_classifier_df
 
-        for data_point in df_first.values:
-            widget_key = data_point[0]
-            if widget_key == target_widget_key:
-                df_row = df_first[df_first['Key'] == widget_key]
-                df_row['Class'] = 1
-                df_row = df_row.drop(['Key'], axis=1)
-                df_row.reset_index(drop=True, inplace=True)
-                df_in_use = pd.concat([df_in_use, df_row], ignore_index=True)
+        csv_additions = []
+
+        df_raw = df_first_before_encoding[df_first_before_encoding['Key'] == target_widget_key]
+
+        for index, row in df_raw.iterrows():
+            for column in df_raw:
+                if column != "Key":
+                    csv_additions.append(row[column])
+
+        df_row = df_first[df_first['Key'] == target_widget_key]
+        df_row['Class'] = 1
+        df_row = df_row.drop(['Key'], axis=1)
+        df_row.reset_index(drop=True, inplace=True)
+        df_in_use = pd.concat([df_in_use, df_row], ignore_index=True)
 
         features = df_in_use.columns[:-1]
         train_true_y = df_in_use['Class']
@@ -249,17 +268,35 @@ class PageAnalysisService:
 
             PICKLER.write('error_messages_live.clf', clf)
 
+            csv_additions.append("ErrorMessage")
+
+            with open(f'{self.base_path}/error_messages_sys_live.csv', 'a') as f:
+                writer = csv.writer(f)
+                writer.writerow(csv_additions)
+
         elif element_class == 'labelCandidate':
             self.__label_classifier = clf
             self.__label_classifier_df = df_in_use
 
             PICKLER.write('label_candidates_live.clf', clf)
 
+            csv_additions.append("LabelCandidate")
+
+            with open(f'{self.base_path}/label_candidates_sys_live.csv', 'a') as f:
+                writer = csv.writer(f)
+                writer.writerow(csv_additions)
+
         elif element_class == 'commit':
             self.__commit_classifier = clf
             self.__commit_classifier_df = df_in_use
 
             PICKLER.write('commits_live.clf', clf)
+
+            csv_additions.append("Commit")
+
+            with open(f'{self.base_path}/commits_sys_live.csv', 'a') as f:
+                writer = csv.writer(f)
+                writer.writerow(csv_additions)
 
         train_pred_y = clf.predict(df_in_use[features])
 
@@ -288,4 +325,4 @@ class PageAnalysisService:
         print_cm(cm, target_names)
 
         LOGGER.info("Done training")
-        LOGGER.info(self.storage)
+
