@@ -38,17 +38,22 @@ class FrameMapper:
             },
             "Class": {
                 "None": 0,
-                "LabelCandidate": 1
+                "LabelCandidate": 1,
+                "Commit": 2
             },
         }
 
         df = data_frame.copy()
-        df.replace(feature_mapping, inplace=True)
 
         for col in ['Tag', 'Parent_Tag', 'Num_Children', 'Num_Siblings', 'Depth', 'X_Percent', 'Y_Percent', 'Text']:
-            del df[col]
+            if col in df:
+                del df[col]
 
-        return df
+        before_replacement = df.copy()
+
+        df.replace(feature_mapping, inplace=True)
+
+        return df, before_replacement
 
     @staticmethod
     def map_page_titles(data_frame):

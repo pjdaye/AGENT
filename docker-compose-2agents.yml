@@ -16,6 +16,8 @@ services:
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
     ports:
       - "9000:9000"
+    volumes:
+      - ./components/page-analyzer/src/data:/app/src/data
 
   form-expert:
     build: ./components/form-expert
