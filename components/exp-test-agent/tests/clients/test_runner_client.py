@@ -182,7 +182,7 @@ def test_concrete_state_returns_false_when_get_document_location_script_fails(_,
 @patch('Clients.runner_client.LOGGER')
 def test_concrete_state_returns_empty_concrete_state_when_page_is_xml(_, runner_client):
     # Arrange
-    def command_side_effect():
+    def command_side_effect(*_):
         response  = {
             'success': True,
             'data': 'document.xml'
