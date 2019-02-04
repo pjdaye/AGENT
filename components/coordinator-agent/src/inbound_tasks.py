@@ -1,3 +1,5 @@
+"""Contains all inbound Celery tasks."""
+
 import jsonpickle
 from aist_common.CeleryConfig.celery_app import create_app
 from aist_common.log import get_logger
@@ -14,6 +16,14 @@ app = create_app([])
 
 @app.task(name='test_coordinator.handle_planned_flow', queue="test_coordinator_queue")
 def coordinator_handle_planned_flow(flow_data):
+    """ A Celery task that handles a queued planned concrete test flow (received from a Worker Agent).
+        Concrete test flows are de-duplicated and routed back to a worker agent in round-robin fashion.
+
+    :param flow_data: The concrete test flow payload.
+
+    :return: True if the concrete test flow was successfully received and processed.
+    """
+
     planned_flow = jsonpickle.decode(flow_data)
     planned_hash = planned_flow.hash
 
