@@ -23,7 +23,7 @@ class ResponseStub:
 def test_page_analysis_client_sets_service_url_from_environment_on_instantiation():
 
     # Arrange and Act
-    with patch('Clients.page_analysis_client.os.environ') as mock_environment:
+    with patch('os.environ') as mock_environment:
         environment = {'PAGE_ANALYSIS_URL': 'url_from_environment'}
         mock_environment.__contains__.return_value = True
         mock_environment.__getitem__.side_effect = environment.__getitem__
@@ -39,7 +39,7 @@ def test_page_analysis_client_sends_successful_post_request_with_url_and_concret
     concrete_state = {'root': 'root'}
 
     # Act and Assert
-    with patch('Clients.page_analysis_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = ResponseStub(status_code=200)
         page_analysis_client.run_analysis(concrete_state)
 
@@ -47,14 +47,13 @@ def test_page_analysis_client_sends_successful_post_request_with_url_and_concret
         mock_post_request.assert_called_with(url, json=concrete_state, verify=False)
 
 
-@patch('Clients.page_analysis_client.LOGGER')
-def test_page_analysis_client_returns_false_when_post_request_fails(_):
+def test_page_analysis_client_returns_false_when_post_request_fails():
     # Arrange
     page_analysis_client = PageAnalysisClient()
     concrete_state = {'root': 'root'}
 
     # Act
-    with patch('Clients.page_analysis_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = ResponseStub(status_code=404)
         result = page_analysis_client.run_analysis(concrete_state)
 

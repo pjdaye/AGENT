@@ -34,6 +34,6 @@ class FillEntireForm:
             ok = runner.perform_action(actionable_widget["selector"], 'set', actionable_widget['value'])
 
             if not ok:
-                LOGGER.error(self._klass, "execute", "Unable to fill form field: " + actionable_widget['key'])
+                LOGGER.error("Unable to fill form field: %s", actionable_widget['key'])
                 return False
         return True

@@ -115,8 +115,7 @@ def test_execute_form_fill_with_one_non_settable_widget_does_not_perform_action(
     # Assert
     runner.perform_action.assert_not_called()
 
-@patch('form_strategies.fill_entire_form.LOGGER')
-def test_execute_form_fill_returns_false_when_perform_action_fails(_, runner, form_expert):
+def test_execute_form_fill_returns_false_when_perform_action_fails(runner, form_expert):
     # Arrange
     actionable_state = ActionableState()
     widget = {

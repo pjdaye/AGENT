@@ -1,5 +1,6 @@
 from unittest.mock import patch, Mock
 from clients.form_expert_client import FormExpertClient
+import pytest
 
 
 class ResponseStub:
@@ -38,7 +39,7 @@ class NoneResponseStub:
 
 def test_form_expert_client_sets_service_url_from_environment_on_instantiation():
     # Arrange and Act
-    with patch('Clients.page_analysis_client.os.environ') as mock_environment:
+    with patch('os.environ') as mock_environment:
         environment = {'FORM_EXPERT_URL': 'url_from_environment'}
         mock_environment.__contains__.return_value = True
         mock_environment.__getitem__.side_effect = environment.__getitem__
@@ -54,7 +55,7 @@ def test_get_concrete_values_returns_empty_list_given_no_widgets():
     form_expert_client = FormExpertClient()
 
     # Act
-    with patch('Clients.form_expert_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = ResponseStub(status_code=200)
         result = form_expert_client.get_concrete_values(widgets)
 
@@ -68,7 +69,7 @@ def test_get_concrete_values_makes_appropriate_post_request_with_no_widgets():
     form_expert_client = FormExpertClient()
 
     # Act
-    with patch('Clients.form_expert_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = ResponseStub(status_code=200)
         form_expert_client.get_concrete_values(widgets)
 
@@ -87,12 +88,28 @@ def test_get_concrete_values_returns_label_from_form_expert_with_one_widget():
     form_expert_client = FormExpertClient()
 
     # Act
-    with patch('Clients.form_expert_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = ResponseStub(status_code=200)
         results = form_expert_client.get_concrete_values(widgets)
 
     # Assert
     assert results == [{'label': 'some_label', 'label_key': 'some_label_key', 'value': 'label_from_form_expert'}]
+
+
+def test_get_concrete_values_raises_environment_error_when_form_expert_response_is_not_200():
+    # Arrange
+    widget = {
+        'label': 'some_label',
+        'label_key': 'some_label_key'
+    }
+    widgets = [widget]
+    form_expert_client = FormExpertClient()
+
+    # Act and Assert
+    with patch('requests.post') as mock_post_request:
+        mock_post_request.return_value = ResponseStub(status_code=404)
+        with pytest.raises(EnvironmentError):
+            form_expert_client.get_concrete_values(widgets)
 
 
 def test_get_concrete_values_returns_label_from_form_expert_with_two_widgets():
@@ -110,7 +127,7 @@ def test_get_concrete_values_returns_label_from_form_expert_with_two_widgets():
     form_expert_client = FormExpertClient()
 
     # Act
-    with patch('Clients.form_expert_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = TwoWidgetResponseStub(status_code=200)
         result = form_expert_client.get_concrete_values(widgets)
 
@@ -131,7 +148,7 @@ def test_get_concrete_values_calls_fallback_for_a_single_label_that_is_not_in_fo
     form_expert_client.fallback = Mock(return_value='fallback_value')
 
     # Act
-    with patch('Clients.form_expert_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = ResponseStub(status_code=200)
         form_expert_client.get_concrete_values(widgets)
 
@@ -151,7 +168,7 @@ def test_get_concrete_values_calls_fallback_for_a_single_label_that_is_none_in_f
     form_expert_client.fallback = Mock(return_value='fallback_value')
 
     # Act
-    with patch('Clients.form_expert_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = NoneResponseStub(status_code=200)
         form_expert_client.get_concrete_values(widgets)
 
@@ -166,7 +183,7 @@ def test_get_concrete_value_returns_fallback_value_when_form_expert_response_is_
     form_expert_client.fallback = Mock(return_value='fallback_value')
 
     # Act
-    with patch('Clients.form_expert_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = ResponseStub(status_code=404)
         result = form_expert_client.get_concrete_value(label_key)
 
@@ -181,7 +198,7 @@ def test_get_concrete_value_returns_fallback_value_when_label_is_not_in_form_exp
     form_expert_client.fallback = Mock(return_value='fallback_value')
 
     # Act
-    with patch('Clients.form_expert_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = ResponseStub(status_code=200)
         result = form_expert_client.get_concrete_value(label_key)
 
@@ -196,7 +213,7 @@ def test_get_concrete_value_returns_fallback_value_when_form_expert_result_is_no
     form_expert_client.fallback = Mock(return_value='fallback_value')
 
     # Act
-    with patch('Clients.form_expert_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = NoneResponseStub(status_code=200)
         result = form_expert_client.get_concrete_value(label_key)
 
@@ -210,11 +227,10 @@ def test_get_concrete_value_returns_label_from_form_expert_with_successful_reque
     form_expert_client = FormExpertClient()
 
     # Act
-    with patch('Clients.form_expert_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = ResponseStub(status_code=200)
         result = form_expert_client.get_concrete_value(label_key)
 
     # Assert
     assert result == 'label_from_form_expert'
-
 

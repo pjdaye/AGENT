@@ -17,8 +17,7 @@ def runner_client():
     return mock_runner_client
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_runner_client_launch_returns_true_on_success(_, runner_client):
+def test_runner_client_launch_returns_true_on_success(runner_client):
     # Arrange
 
     # Act
@@ -28,8 +27,7 @@ def test_runner_client_launch_returns_true_on_success(_, runner_client):
     assert result is True
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_runner_client_launch_returns_false_on_failed_navigation(_, runner_client):
+def test_runner_client_launch_returns_false_on_failed_navigation(runner_client):
     # Arrange
     runner_client.navigate = Mock(return_value=False)
 
@@ -39,8 +37,7 @@ def test_runner_client_launch_returns_false_on_failed_navigation(_, runner_clien
     # Assert
     assert result is False
 
-
-@patch('Clients.runner_client.LOGGER')
+@patch(RunnerClient.__module__ + '.LOGGER')
 def test_runner_client_launch_returns_false_on_aeon_session_error_from_navigate_call(_, runner_client):
     # Arrange
     runner_client.navigate = Mock()
@@ -53,7 +50,7 @@ def test_runner_client_launch_returns_false_on_aeon_session_error_from_navigate_
     assert result is False
 
 
-@patch('Clients.runner_client.LOGGER')
+@patch(RunnerClient.__module__ + '.LOGGER')
 def test_runner_client_launch_returns_false_on_aeon_session_error_from_get_session_call(_, runner_client):
     # Arrange
     runner_client.aeon.get_session.side_effect = AeonSessionError()
@@ -65,8 +62,7 @@ def test_runner_client_launch_returns_false_on_aeon_session_error_from_get_sessi
     assert result is False
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_runner_client_navigate_returns_false_on_execute_command_error(_, runner_client):
+def test_runner_client_navigate_returns_false_on_execute_command_error(runner_client):
     # Arrange
     runner_client.session.execute_command.side_effect = AeonSessionError()
 
@@ -77,8 +73,7 @@ def test_runner_client_navigate_returns_false_on_execute_command_error(_, runner
     assert result is False
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_perform_set_action_returns_true_on_success(_, runner_client):
+def test_perform_set_action_returns_true_on_success(runner_client):
     # Arrange
     selector = 'some_selector'
     action = 'set'
@@ -90,8 +85,7 @@ def test_perform_set_action_returns_true_on_success(_, runner_client):
     assert result is True
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_perform_click_action_returns_true_on_success(_, runner_client):
+def test_perform_click_action_returns_true_on_success(runner_client):
     # Arrange
     selector = 'some_selector'
     action = 'click'
@@ -102,8 +96,7 @@ def test_perform_click_action_returns_true_on_success(_, runner_client):
     # Assert
     assert result is True
 
-@patch('Clients.runner_client.LOGGER')
-def test_perform_set_action_executes_set_command(_, runner_client):
+def test_perform_set_action_executes_set_command(runner_client):
     # Arrange
     selector = 'some_selector'
     action = 'set'
@@ -119,8 +112,7 @@ def test_perform_set_action_executes_set_command(_, runner_client):
     assert command == 'SetCommand'
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_perform_click_action_executes_click_command(_, runner_client):
+def test_perform_click_action_executes_click_command(runner_client):
     # Arrange
     selector = 'some_selector'
     action = 'click'
@@ -147,7 +139,7 @@ def test_perform_unknown_action_returns_false(runner_client):
     assert result is False
 
 
-@patch('Clients.runner_client.LOGGER')
+@patch(RunnerClient.__module__ + '.LOGGER')
 def test_perform_action_returns_false_on_aeon_session_error(_, runner_client):
     # Arrange
     selector = 'some_selector'
@@ -161,8 +153,7 @@ def test_perform_action_returns_false_on_aeon_session_error(_, runner_client):
     assert result is False
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_concrete_state_returns_false_when_get_document_location_script_fails(_, runner_client):
+def test_concrete_state_returns_false_when_get_document_location_script_fails(runner_client):
     # Arrange
     def command_side_effect(*args):
         if args[0] == 'ExecuteScriptCommand':
@@ -178,8 +169,7 @@ def test_concrete_state_returns_false_when_get_document_location_script_fails(_,
     assert result is False
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_concrete_state_returns_empty_concrete_state_when_page_is_xml(_, runner_client):
+def test_concrete_state_returns_empty_concrete_state_when_page_is_xml(runner_client):
     # Arrange
     def command_side_effect(*_):
         response  = {
@@ -203,8 +193,7 @@ def test_concrete_state_returns_empty_concrete_state_when_page_is_xml(_, runner_
     assert result == expected_response
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_concrete_state_returns_empty_concrete_state_when_page_is_json(_, runner_client):
+def test_concrete_state_returns_empty_concrete_state_when_page_is_json(runner_client):
     # Arrange
     def command_side_effect(*args):
         response = {
@@ -228,8 +217,7 @@ def test_concrete_state_returns_empty_concrete_state_when_page_is_json(_, runner
     assert result == expected_response
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_concrete_state_returns_false_when_has_jquery_script_failed(_, runner_client):
+def test_concrete_state_returns_false_when_has_jquery_script_failed(runner_client):
     # Arrange
     runner_client.HAS_JQUERY_SCRIPT = 'has_jquery_script'
 
@@ -248,8 +236,7 @@ def test_concrete_state_returns_false_when_has_jquery_script_failed(_, runner_cl
     assert result is False
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_concrete_state_injects_query_when_page_does_not_have_jquery(_, runner_client):
+def test_concrete_state_injects_query_when_page_does_not_have_jquery(runner_client):
     # Arrange
     runner_client.HAS_JQUERY_SCRIPT = 'has_jquery'
 
@@ -276,8 +263,7 @@ def test_concrete_state_injects_query_when_page_does_not_have_jquery(_, runner_c
     runner_client.session.execute_command.assert_any_call('ExecuteAsyncScriptCommand', [runner_client.JQUERY_SCRIPT])
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_concrete_state_returns_false_when_jquery_injection_fails(_, runner_client):
+def test_concrete_state_returns_false_when_jquery_injection_fails(runner_client):
     # Arrange
     runner_client.JQUERY_SCRIPT = 'jquery'
 
@@ -309,8 +295,7 @@ def test_concrete_state_returns_false_when_jquery_injection_fails(_, runner_clie
     assert result is False
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_concrete_state_returns_false_when_fix_jquery_script_fails(_, runner_client):
+def test_concrete_state_returns_false_when_fix_jquery_script_fails(runner_client):
     # Arrange
     runner_client.FIX_JQUERY_SCRIPT = 'fix_script'
 
@@ -336,8 +321,7 @@ def test_concrete_state_returns_false_when_fix_jquery_script_fails(_, runner_cli
     assert result is False
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_concrete_state_returns_false_when_dom_is_not_loaded(_, runner_client):
+def test_concrete_state_returns_false_when_dom_is_not_loaded(runner_client):
     # Arrange
     runner_client.CHECK_READY_SCRIPT = 'check_ready_script'
 
@@ -363,8 +347,7 @@ def test_concrete_state_returns_false_when_dom_is_not_loaded(_, runner_client):
     assert result is False
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_concrete_state_returns_false_when_execute_scrape_script_fails(_, runner_client):
+def test_concrete_state_returns_false_when_execute_scrape_script_fails(runner_client):
     # Arrange
     runner_client.SCRAPE_SCRIPT = 'scrape'
 
@@ -390,7 +373,7 @@ def test_concrete_state_returns_false_when_execute_scrape_script_fails(_, runner
     assert result is False
 
 
-@patch('Clients.runner_client.LOGGER')
+@patch(RunnerClient.__module__ + '.LOGGER')
 def test_concrete_state_returns_false_when_aeon_session_error_occurs(_, runner_client):
     # Arrange
     runner_client.session.execute_command.side_effect = AeonSessionError()
