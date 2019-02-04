@@ -1,3 +1,5 @@
+"""The main Agent entry-point. Contains all necessary Celery plumbing code."""
+
 import threading
 
 import celery.worker

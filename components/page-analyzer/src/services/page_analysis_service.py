@@ -1,4 +1,5 @@
 """Handles web-page element classification and training requests."""
+
 import csv
 import os
 
@@ -85,6 +86,9 @@ class PageAnalysisService:
         self._load_classifiers()
 
     def _load_classifiers(self):
+        """ Loads system-delivered training data, pre-trained classifiers, and live trainable classifiers.
+        """
+
         self.__label_classifier_df = pd.read_csv(f'{self.base_path}/label_candidates_sys.csv')
 
         self.__error_msg_classifier_df = pd.read_csv(f'{self.base_path}/error_messages_sys.csv')
@@ -325,4 +329,3 @@ class PageAnalysisService:
         print_cm(cm, target_names)
 
         LOGGER.info("Done training")
-
