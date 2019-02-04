@@ -1,6 +1,6 @@
 import math
 from unittest import mock
-from unittest.mock import patch
+from unittest.mock import patch, call
 
 import classifier
 
@@ -122,3 +122,105 @@ def test_fill_form_no_neighbor_found(get_neighbor_mock):
     assert len(result) == 2
     assert result['id_a'] is None
     assert result['id_b'] is None
+
+
+@patch('classifier.LOGGER')
+@patch('classifier.get_neighbor')
+def test_fill_form_nearest_neighbor_does_not_provide_matching_fields(get_neighbor_mock, logger_mock):
+    # Arrange
+    forms = []
+    form = {
+        'features': [
+            'g_label_a',
+            'g_label_b'
+        ],
+        'form': {
+            'g_label_a': {
+                'id': 'id_a'
+            },
+            'g_label_b': {
+                'id': 'id_b'
+            }
+        }
+    }
+    get_neighbor_mock.return_value = {
+        'form': {
+            'g2_label_a': 'value1',
+            'g2_label_b': 'value2'
+        }
+    }
+
+    # Act
+    result = classifier.fill_form(forms, form)
+
+    # Assert
+    assert len(result) == 2
+    assert result['id_a'] is None
+    assert result['id_b'] is None
+    logger_mock.info\
+        .assert_called_with('unfilled', ['g_label_a', 'g_label_b'])
+
+
+@patch('classifier.LOGGER')
+@patch('classifier.get_neighbor')
+def test_fill_form_recursive_call_completes_form(get_neighbor_mock, logger_mock):
+    # Arrange
+    forms = []
+    form = {
+        'features': [
+            'g_label_a',
+            'g_label_b'
+        ],
+        'form': {
+            'g_label_a': {
+                'id': 'id_a'
+            },
+            'g_label_b': {
+                'id': 'id_b'
+            }
+        }
+    }
+    get_neighbor_mock.side_effect = [
+        {
+            'form': {
+                'g_label_a': {
+                    'value': 'value1'
+                }
+            }
+        },
+        {
+            'form': {
+                'g_label_b': {
+                    'value': 'value2'
+                }
+            }
+        }
+    ]
+
+    # Act
+    result = classifier.fill_form(forms, form)
+
+    # Assert
+    assert len(result) == 2
+    assert result['id_a'] == 'value1'
+    assert result['id_b'] == 'value2'
+    logger_mock.info.assert_has_calls(
+        [
+            call('Neighbor', {
+                'form': {
+                    'g_label_a': {
+                        'value': 'value1'
+                    }
+                }
+            }),
+            call('unfilled', ['g_label_b']),
+            call('Neighbor', {
+                'form': {
+                    'g_label_b': {
+                        'value': 'value2'
+                    }
+                }
+            }),
+            call('unfilled', [])
+        ]
+    )
