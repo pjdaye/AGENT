@@ -1,5 +1,7 @@
 import math
 from unittest import mock
+from unittest.mock import patch
+
 import classifier
 
 
@@ -76,3 +78,47 @@ def test_get_neighbor_multiple_nearest_neighbors():
 
     # Assert
     assert nearest_neighbor == 4 or nearest_neighbor == 6
+
+
+@patch('classifier.get_neighbor')
+def test_fill_form_empty_form(_):
+    # Arrange
+    forms = []
+    form = {
+        'features': []
+    }
+
+    # Act
+    result = classifier.fill_form(forms, form)
+
+    # Assert
+    assert len(result) == 0
+
+
+@patch('classifier.get_neighbor')
+def test_fill_form_no_neighbor_found(get_neighbor_mock):
+    # Arrange
+    forms = []
+    form = {
+        'features': [
+            'g_label_a',
+            'g_label_b'
+        ],
+        'form': {
+            'g_label_a': {
+                'id': 'id_a'
+            },
+            'g_label_b': {
+                'id': 'id_b'
+            }
+        }
+    }
+    get_neighbor_mock.return_value = None
+
+    # Act
+    result = classifier.fill_form(forms, form)
+
+    # Assert
+    assert len(result) == 2
+    assert result['id_a'] is None
+    assert result['id_b'] is None

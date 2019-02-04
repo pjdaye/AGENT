@@ -1,3 +1,5 @@
+"""Provides a method generalizing form labels"""
+
 import re
 
 from nltk.corpus import wordnet

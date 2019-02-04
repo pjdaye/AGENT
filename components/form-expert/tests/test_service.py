@@ -108,6 +108,46 @@ def test_health_check():
     assert service.health_check() == "{\"healthy\": true}"
 
 
+def generalize_label_side_effect(label):
+    return 'g_{}'.format(label)
+
+
+@patch('service.datetime.datetime')
+@patch('service.generalize_label', side_effect=generalize_label_side_effect)
+def test_transform_form(_, datetime_mock):
+    # Arrange
+    form = [
+        {
+            'label': 'label_a'
+        },
+        {
+            'label': 'label_b'
+        },
+        {
+            'label': 'label_c'
+        },
+        {
+            'label': 'label_b'
+        }
+    ]
+    datetime_mock.utcnow.return_value = 'created_date'
+
+    # Act
+    result = service.transform_form(form)
+
+    # Assert
+    assert len(result['features']) == 4
+    assert result['features'][0] == 'g_label_a'
+    assert result['features'][1] == 'g_label_b'
+    assert result['features'][2] == 'g_label_b2'
+    assert result['features'][3] == 'g_label_c'
+    assert result['form']['g_label_a']['label'] == 'label_a'
+    assert result['form']['g_label_b']['label'] == 'label_b'
+    assert result['form']['g_label_b2']['label'] == 'label_b'
+    assert result['form']['g_label_c']['label'] == 'label_c'
+    assert result['created_at'] == 'created_date'
+
+
 def test_save_form(db_mock):
     # Arrange
     form_mock = Mock()
