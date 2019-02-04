@@ -21,7 +21,7 @@ def start_session(session_start_data):
     """ A Celery task that starts an agent session.
 
     :param session_start_data: The request payload.
-    :return: True if the agent started successfully.
+    :return: False if environment variable RUNNER_URL not setup properly; otherwise, True.
     """
 
     LOGGER.info("Starting session.")
@@ -46,7 +46,7 @@ def start_session(session_start_data):
 def stop_session():
     """ A Celery task that stops all agent sessions.
 
-    :return: True if the agent received the stop request successfully.
+    :return: True
     """
 
     LOGGER.info("Stopping session.")
@@ -61,7 +61,7 @@ def handle_planned_flow(flow_data):
     """ A Celery task that handles a queued planned concrete test flow (received from the Coordinator Agent).
 
     :param flow_data: The concrete test flow payload.
-    :return: True if the concrete test flow was successfully received and internally enqueued.
+    :return: True
     """
 
     planned_flow = jsonpickle.decode(flow_data)

@@ -1,6 +1,6 @@
 import bottle
 from aist_common.log import get_logger
-from bottle import request
+from bottle import request, response
 from services.gateway_service import GatewayService
 
 LOGGER = get_logger('gateway-controller')
@@ -22,9 +22,11 @@ class GatewayController:
 
     def start_session(self):
         request_payload = request.json
+        LOGGER.info(f'Starting session: {request_payload}')
         session = self._service.start_session(request_payload)
         return bottle.HTTPResponse(body=session, status=200)
 
     def stop_session(self):
+        LOGGER.info(f'Stopping session')
         session = self._service.stop_session()
         return bottle.HTTPResponse(body=session, status=200)
