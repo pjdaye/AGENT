@@ -1,3 +1,5 @@
+"""The main service entry-point. Contains all necessary Bottle plumbing code."""
+
 import os
 
 import bottle

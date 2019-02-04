@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+"""Handles abstract test flow generation requests."""
+
 import random
 
 import json
@@ -11,7 +12,12 @@ LOGGER = get_logger('test-generator-service')
 
 
 class TestGeneratorService:
+    """Handles abstract test flow generation requests."""
+
     def __init__(self):
+        """ Initializes the TestGeneratorService class.
+        """
+
         with open('data/embedding.json') as f:
             data = json.load(f)
             self.char_indices = data['char_indices']
@@ -28,6 +34,21 @@ class TestGeneratorService:
         self.graph = tf.get_default_graph()
 
     def predict(self, query, num_to_predict):
+        """ Relies on an underlying pre-trained long short-term memory-based (LSTM) recurrent
+            neural network (RNN) to generate an abstract test flow of maximum length self.maxlen.
+            Invokes the LSTM up to maxlen times.
+
+            Example:
+            Given a query such as “Observe TextBox” consisting of 2 words, we invoke the LSTM 9 times,
+            each time appending the predicted word to the query for the next prediction step.
+
+        :param query: The beginning of the sentence to start generating from.
+
+        :param num_to_predict: The number of abstract test flow sentences to generate.
+
+        :return: A generated abstract test flow sentence.
+        """
+
         output = []
 
         for i in range(num_to_predict):
@@ -65,6 +86,14 @@ class TestGeneratorService:
         return output
 
     def sample(self, preds, temperature=1.0):
+        """ Controls LSTM prediction randomness by scaling the logits prior to applying softmax.
+
+        :param preds: A set of generated predictions.
+        :param temperature: Hyper-parameter used to control prediction randomness.
+
+        :return: A final prediction from the set of possible predictions.
+        """
+
         preds = np.asarray(preds).astype('float64')
         preds = np.log(preds) / temperature
         exp_preds = np.exp(preds)
