@@ -1,9 +1,9 @@
-from unittest.mock import Mock, patch, mock_open
-
 import pytest
+
+from unittest.mock import Mock, patch, mock_open
 from aeoncloud.exceptions.aeon_session_error import AeonSessionError
 
-from Clients.runner_client import RunnerClient
+from clients.runner_client import RunnerClient
 
 
 @pytest.fixture
@@ -135,8 +135,7 @@ def test_perform_click_action_executes_click_command(_, runner_client):
     assert command == 'ClickCommand'
 
 
-@patch('Clients.runner_client.LOGGER')
-def test_perform_unknown_action_returns_false(_, runner_client):
+def test_perform_unknown_action_returns_false(runner_client):
     # Arrange
     selector = 'some_selector'
     action = 'unknown'

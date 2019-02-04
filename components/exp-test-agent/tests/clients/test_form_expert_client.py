@@ -1,5 +1,5 @@
 from unittest.mock import patch, Mock
-from Clients.form_expert_client import FormExpertClient
+from clients.form_expert_client import FormExpertClient
 
 
 class ResponseStub:

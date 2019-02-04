@@ -1,5 +1,5 @@
 from unittest.mock import patch
-from Clients.flow_generation_client import FlowGeneratorClient
+from clients.flow_generation_client import FlowGeneratorClient
 
 
 class EmptySequenceResponseStub:
@@ -24,7 +24,7 @@ class SingleSequenceResponseStub:
 
 def test_flow_generation_client_sets_service_url_from_environment_on_instantiation():
     # Arrange and Act
-    with patch('Clients.page_analysis_client.os.environ') as mock_environment:
+    with patch('os.environ') as mock_environment:
         environment = {'FLOW_GENERATION_URL': 'url_from_environment'}
         mock_environment.__contains__.return_value = True
         mock_environment.__getitem__.side_effect = environment.__getitem__
@@ -42,7 +42,7 @@ def test_flow_generation_client_makes_post_request_with_url_and_query():
     url = 'http://flow-generator/v1/predict'
 
     # Act
-    with patch('Clients.flow_generation_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = EmptySequenceResponseStub(status_code=200)
         flow_generation_client.generate_flow(original_query)
 
@@ -56,7 +56,7 @@ def test_flow_generation_client_returns_none_on_successful_response_and_no_seque
     query = 'Observe Textbox FirstName'
 
     # Act
-    with patch('Clients.flow_generation_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = EmptySequenceResponseStub(status_code=200)
         flow = flow_generation_client.generate_flow(query)
 
@@ -70,7 +70,7 @@ def test_flow_generation_client_returns_expanded_sequence_on_successful_response
     query = 'Observe Textbox FirstName'
 
     # Act
-    with patch('Clients.flow_generation_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = SingleSequenceResponseStub(status_code=200)
         flow = flow_generation_client.generate_flow(query)
 
@@ -78,14 +78,13 @@ def test_flow_generation_client_returns_expanded_sequence_on_successful_response
     assert flow == 'OBSERVE TEXTBOX FIRSTNAME EXPANSION1 EXPANSION2'
 
 
-@patch('Clients.flow_generation_client.LOGGER')
-def test_flow_generation_client_returns_false_when_response_is_not_200(_):
+def test_flow_generation_client_returns_false_when_response_is_not_200():
     # Arrange
     flow_generation_client = FlowGeneratorClient()
     query = 'Observe Textbox FirstName'
 
     # Act
-    with patch('Clients.flow_generation_client.requests.post') as mock_post_request:
+    with patch('requests.post') as mock_post_request:
         mock_post_request.return_value = EmptySequenceResponseStub(status_code=404)
         flow = flow_generation_client.generate_flow(query)
 

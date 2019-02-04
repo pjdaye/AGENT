@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from Clients.page_analysis_client import PageAnalysisClient
+from clients.page_analysis_client import PageAnalysisClient
 
 
 class ResponseStub:
