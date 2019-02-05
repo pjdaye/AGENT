@@ -40,32 +40,17 @@ class TestPageAnalyzer:
             json_data = json.loads(file.read())
 
         # Act.
-        classes = PageAnalysisService().get_page_analysis(json_data)
+        classes = PageAnalysisService(base_path=TestPageAnalyzer.BASE_PATH).get_page_analysis(json_data)
 
         # Assert.
         assert len(classes['pageTitles']) == 1
-        assert len(classes['labelCandidates']) == 5
+        assert len(classes['labelCandidates']) == 0
         assert len(classes['commits']) == 1
         assert len(classes['errorMessages']) == 0
         assert len(classes['cancels']) == 0
 
         assert 'H20_0_1_1_0_0:4' in classes['pageTitles']
         assert json_data['widgets']['H20_0_1_1_0_0:4']['properties']['text'] == 'Owner'
-
-        assert 'LABEL0_0_1_1_0_1_0_0_0:7' in classes['labelCandidates']
-        assert json_data['widgets']['LABEL0_0_1_1_0_1_0_0_0:7']['properties']['text'] == 'First Name'
-
-        assert 'LABEL0_0_1_1_0_1_0_1_0:7' in classes['labelCandidates']
-        assert json_data['widgets']['LABEL0_0_1_1_0_1_0_1_0:7']['properties']['text'] == 'Last Name'
-
-        assert 'LABEL0_0_1_1_0_1_0_2_0:7' in classes['labelCandidates']
-        assert json_data['widgets']['LABEL0_0_1_1_0_1_0_2_0:7']['properties']['text'] == 'Address'
-
-        assert 'LABEL0_0_1_1_0_1_0_3_0:7' in classes['labelCandidates']
-        assert json_data['widgets']['LABEL0_0_1_1_0_1_0_3_0:7']['properties']['text'] == 'City'
-
-        assert 'LABEL0_0_1_1_0_1_0_4_0:7' in classes['labelCandidates']
-        assert json_data['widgets']['LABEL0_0_1_1_0_1_0_4_0:7']['properties']['text'] == 'Telephone'
 
         assert 'BUTTON0_0_1_1_0_1_1_0_0:7' in classes['commits']
         assert json_data['widgets']['BUTTON0_0_1_1_0_1_1_0_0:7']['properties']['text'] == 'Add Owner'

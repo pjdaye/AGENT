@@ -1,12 +1,30 @@
 import json
+import os
+import shutil
+from distutils.dir_util import copy_tree
 from unittest.mock import Mock
 
 from boddle import boddle
 
 from controllers.page_analysis_controller import PageAnalysisController
+from services.page_analysis_service import PageAnalysisService
 
 
 class TestPageAnalysisController:
+    BASE_PATH = None
+    BACKUP_PATH = None
+
+    @classmethod
+    def setup_class(cls):
+        cls.BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data'))
+        cls.BACKUP_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data', 'backup2'))
+        copy_tree(cls.BASE_PATH, cls.BACKUP_PATH)
+
+    @classmethod
+    def teardown_class(cls):
+        copy_tree(cls.BACKUP_PATH, cls.BASE_PATH)
+        shutil.rmtree(cls.BACKUP_PATH)
+
     def setup_method(self):
         class BottleAppStub:
             def __init__(self):
@@ -20,7 +38,7 @@ class TestPageAnalysisController:
 
     def test_add_routes(self):
         # Arrange.
-        controller = PageAnalysisController(self.app_stub)
+        controller = PageAnalysisController(self.app_stub, Mock())
 
         # Act.
         controller.add_routes()
@@ -33,7 +51,7 @@ class TestPageAnalysisController:
 
     def test_get_status(self):
         # Arrange.
-        controller = PageAnalysisController(self.app_stub)
+        controller = PageAnalysisController(self.app_stub, Mock())
 
         # Act.
         response = controller.get_status()
@@ -45,7 +63,8 @@ class TestPageAnalysisController:
 
     def test_page_analysis(self):
         # Arrange.
-        controller = PageAnalysisController(self.app_stub)
+        controller = PageAnalysisController(self.app_stub,
+                                            PageAnalysisService(base_path=TestPageAnalysisController.BASE_PATH))
 
         with open('json/login_page.json') as file:
             login_page_concrete_state = json.loads(file.read())
@@ -67,7 +86,8 @@ class TestPageAnalysisController:
 
     def test_get_page_titles(self):
         # Arrange.
-        controller = PageAnalysisController(self.app_stub)
+        controller = PageAnalysisController(self.app_stub,
+                                            PageAnalysisService(base_path=TestPageAnalysisController.BASE_PATH))
 
         with open('json/login_page.json') as file:
             login_page_concrete_state = json.loads(file.read())
