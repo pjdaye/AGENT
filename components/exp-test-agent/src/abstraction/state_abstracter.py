@@ -30,7 +30,7 @@ class StateAbstracter:
                     act_state.add_widget(widget)
             else:
                 act_state.add_static_widget(widget)
-            act_state.calculate_hash()
+        act_state.calculate_hash()
         return act_state
 
     @staticmethod
