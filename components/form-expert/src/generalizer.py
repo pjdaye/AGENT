@@ -1,16 +1,23 @@
+"""Provides a method generalizing form labels"""
+
 import re
 
-import nltk
 from nltk.corpus import wordnet
 import spacy
 
 print('Loading Spacy EN')
 en_nlp = spacy.load('en')
 
+
 def generalize_label(input_label):
+    """Generalizes labels so that similar form inputs can be mapped.
+
+    :param input_label: The label to generalize.
+    :return: The generalized form of the label.
+    """
+
     result = input_label
     friendly_label = re.split(r'[`\-=~!@#$%^&*()_+\[\]{};\'\\:"|<,./<>?]', input_label)[0].rstrip()
-    nums = [int(s) for s in input_label.split() if s.isdigit()]
     syns = wordnet.synsets(friendly_label.replace(' ', '_'))
     doc = en_nlp(input_label)
 
@@ -37,42 +44,3 @@ def generalize_label(input_label):
     elif root is not None:
         result = root
     return result.replace('_', '')
-
-
-def main():
-    test_set = [
-        'enter the email associated with your account',
-        'zip code',
-        'postal code',
-        'first name',
-        'last name',
-        'city',
-        'reference name',
-        'password',
-        'username',
-        'email',
-        'street',
-        'street address',
-        'state',
-        'country',
-        'zip',
-        'search',
-        'apt. number',
-        'credit card number',
-        'cvv',
-        'expiration date',
-        'birth date',
-        'birthday',
-        'date of birth',
-        'account',
-        'dependent',
-        'job title',
-        'title',
-         'zip / postal code',
-         'state / province']
-    for test in test_set:
-        print(generalize_label(test))
-
-
-if __name__ == '__main__':
-    main()

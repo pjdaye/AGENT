@@ -1,3 +1,5 @@
+"""This files provides the API endpoints for storing and filling forms"""
+
 import datetime
 import json
 import os
@@ -20,15 +22,13 @@ MONGO_DATABASE = os.environ['FORM_EXPERT_DATABASE'] \
 app = bottle.app()
 
 
-"""
-[{
-    "label": "city",
-    "element": "input-text",
-    "value": "hello",
-}]
-"""
 @post('/api/v1/form')
 def form_example():
+    """Stores training data from a given form to the database.
+
+    :return: The response payload containing the generated ID of the given form.
+    """
+
     form = json.load(request.body)
     client = MongoClient(MONGO_HOST)
     db = client.get_database(MONGO_DATABASE)
@@ -36,56 +36,40 @@ def form_example():
     response.content_type = 'application/json'
     return json.dumps({'form_id': save_form(db, form)})
 
-"""
-id: 2084024gj2ogj,
-form: [{
-    "label": "city",
-    "element": "input-text",
-    "value": "hello",
-}]
 
-{
-    _id: 2049g204g90a,
-    label: "city",
-    values: "Weston", "Miami"
-}
-"""
-
-"""
-[
-    {
-        "label": "city",
-    }
-]
-"""
 @post('/api/v1/fill_form')
 def fill_form_endpoint():
-    # print('BODY: ', request.body)
+    """Fills a given form using the stored forms in the database.
+
+    :return: A mapping from form element IDs to suggested values for the form.
+    """
+
     form = json.load(request.body)
     client = MongoClient(MONGO_HOST)
     db = client.get_database(MONGO_DATABASE)
     form = transform_form(form)
     forms = db.forms.find({})
     form = fill_form(forms, form)
-    # print('FINAL', form)
     response.content_type = 'application/json'
     return json.dumps(form)
-
-"""
-{
-    "city": {
-        "label": "city",
-        "value": "Weston"
-    }
-}
-"""
 
 
 @get('/api/v1/health_check')
 def health_check():
+    """Health check endpoint of the form expert.
+
+    :return: Returns a flag called 'healthy' which is set to True.
+    """
+
     return json.dumps({'healthy': True})
 
+
 def transform_form(form):
+    """Generalizes the labels of a form and extracts the labels as unique features.
+
+    :param form: The form to transform.
+    :return: The transformed form.
+    """
     features = []
     form_dict = {}
     for field in form:
@@ -104,9 +88,15 @@ def transform_form(form):
 
 
 def save_form(db, form):
+    """Saves a form to the database.
+
+    :param db: The database to store the form in.
+    :param form: The form to store.
+    :return: The generated ID of the form.
+    """
+
     forms = db.forms
     result = forms.insert_one(form)
-    # print('SAVED', form)
     return str(result.inserted_id)
 
 
