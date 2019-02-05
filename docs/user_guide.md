@@ -482,30 +482,6 @@ The Exploratory Test Agent sends an instance of the ConcreteTestFlow class, a pl
 **Param:** flow_data (A Jsonified instance of the Exploratory Test Agent, ConcreteTestFlow class)  
 **Return Result:** Returns False if environment variable RUNNER_URL not setup properly; otherwise, True.
 
-### Coordinator
-
-### Page Analyzer
-
-### Form Expert
-
-### Gateway
-
-### Flow Generator
-
-## Agent Training
-
-### Agent-X
-
-#### Page Labeler
-
-#### Component Classification Viewer
-
-### Page Recognition Training
-
-### Test Flow Training
-
-## Test Flow Grammar
-
-## Dependencies
-
 ## Warnings
+
+AGENT automatically explores and tests a web application without bounds. It will attempt to click every button and link, and it will attempt to fill-out every field. Do not point AGENT at a URL if such unbounded exploration may cause a problem.
