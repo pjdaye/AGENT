@@ -29,7 +29,8 @@ class AgentLoop:
 
     NUM_ITERATIONS = 1000
 
-    def __init__(self, sut_url, runner_url):
+    def __init__(self, sut_url, runner_url, form_expert_client=None, runner_client=None,
+                 page_analysis_client=None, flow_generator_client=None, flow_publisher=None, flow_executor=None):
         """ Initializes the AgentLoop class.
 
         :param sut_url: The URL of the SUT.
@@ -41,33 +42,33 @@ class AgentLoop:
 
         self.mapper = StateAbstracter()
         self.label_extracter = LabelExtraction()
-        self.form_expert = FormExpertClient()
+        self.form_expert = form_expert_client if form_expert_client else FormExpertClient()
         self.memory = PriorityMemory()
         self.observer = StateObserver()
         self.seq_parser = SequenceParser()
         self.flow_planner = FlowPlanner()
         self.defect_rep = DefectReporter()
-        self.flow_publish = PlannedFlowPublisher()
+        self.flow_publish = flow_publisher if flow_publisher else PlannedFlowPublisher()
 
-        self.runner = RunnerClient(self.runner_url)
-        self.page_analyzer = PageAnalysisClient()
-        self.flow_generator = FlowGeneratorClient()
+        self.runner = runner_client if runner_client else RunnerClient(self.runner_url)
+        self.page_analyzer = page_analysis_client if page_analysis_client else PageAnalysisClient()
+        self.flow_generator = flow_generator_client if flow_generator_client else FlowGeneratorClient()
 
-        self.flow_executer = FlowExecutor(self.form_expert,
-                                          self.page_analyzer,
-                                          self.mapper,
-                                          self.label_extracter,
-                                          self.observer,
-                                          self.defect_rep)
+        self.flow_executer = flow_executor if flow_executor else FlowExecutor(self.form_expert,
+                                                                              self.page_analyzer,
+                                                                              self.mapper,
+                                                                              self.label_extracter,
+                                                                              self.observer,
+                                                                              self.defect_rep)
 
     def start(self):
         """ Starts the agent control loop.
         """
 
-        loop_thread = threading.Thread(target=self._loop_start)
+        loop_thread = threading.Thread(target=self.loop_start)
         loop_thread.start()
 
-    def _loop_start(self):
+    def loop_start(self):
 
         """ Runs the main control loop.
             Starts by launching the runner, then executes AgentLoop.NUM_ITERATIONS loop iterations.
@@ -89,21 +90,21 @@ class AgentLoop:
 
             # noinspection PyBroadException
             try:
-                self._loop_iteration()
+                self.loop_iteration()
             except Exception:
                 LOGGER.exception(f"Fatal error during iteration {str(i)}.")
                 LOGGER.info(f"Stopping session.")
                 break
 
-        self._loop_end()
+        self.loop_end()
 
-    def _loop_end(self):
+    def loop_end(self):
         """ Finalizes the main control loop, closing any open runner session.
         """
 
         self.runner.quit()
 
-    def _loop_iteration(self):
+    def loop_iteration(self):
         """ Executes a single control loop iteration. Each loop iteration performs the following steps:
             1) Perceive the current environment, drawing observations.
             2) For each observation, consult the flow generation service to generate abstract test flows.
@@ -171,7 +172,6 @@ class AgentLoop:
                     planned_flows = self.flow_planner.plan(abstract_state, page_analysis, parsed_flow)
 
                     if planned_flows is not False:
-
                         """Extend the internal concrete test flow queue with any planned flows."""
                         test_flow_queue.extend(planned_flows)
 
