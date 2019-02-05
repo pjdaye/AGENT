@@ -3,8 +3,9 @@
 <head>
     <script>
     function start() {
-        var xhr = new XMLHttpRequest();
-        var sut_url = document.getElementById('SUT_URL');
+        let xhr = new XMLHttpRequest();
+        // let sut_url = document.getElementById('SUT_URL');
+        let sut_url = "http://pet-clinic:8080";
         xhr.open("POST", "http://localhost:9002/v1/start", true);
         xhr.setRequestHeader("Content-Type", "application/json");
 
@@ -15,7 +16,9 @@
             }
         };
         var data = JSON.stringify({"SUT_URL": sut_url});
-        xhr.send(data);
+        console.log("Starting AGENT with a sut_url of " + sut_url);
+        console.log("JSON payload is: " + data);
+        console.log("Post response is: " + xhr.send(data));
     }
 
     function stop() {
@@ -30,6 +33,8 @@
             }
         };
         var data = JSON.stringify({});
+        console.log("Stopping Agent");
+        console.log("JSON payload is: " + data);
         xhr.send(data);
     }
     </script>
@@ -48,22 +53,17 @@
     <title>Agent</title>
 </head>
 <body>
-System Under Test URL: <input type="text" id="SUT_URL" value="http://pet-clinic:8080">
 
-<button onclick="start()">Start</button>
-
-<button onclick="stop()">Stop</button>
+<form>
+    <label for="SUT_URL">System Under Test URL</label>
+    <input id='SUT_URL' value="http://pet-clinic:8080">
+    <button onclick="start()">Start</button>
+    <button onclick="stop()">Stop</button>
+</form>
 
 <iframe src="http://localhost:8001/vnc.html" id="vnc_frame" scrolling="no" frameborder="0"></iframe>
 
 <iframe src="http://localhost:5555" id="flower_frame" scrolling="no" frameborder="0"></iframe>
-
-<form action="http://localhost:9002/v1/start" method="post">
-  System Under Test URL:<br>
-  <input type="text" name="SUT_URL" value="http://pet-clinic:8080">
-  <br><br>
-  <input type="submit" value="Submit">
-</form>
 
 </body>
 </html>
