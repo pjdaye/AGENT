@@ -8,7 +8,7 @@ Abstract test flows, represented in a standard grammar and learned from a traini
 
 A coordinator dispatches testing assignments through a message queue and enables the  support of multiple distributed, concurrent execution and testing agents. Each agent is capable of independently interacting with the System Under Test via an instrumented Chrome client and AEON runner. This AI for Software Testing solution, designed for research and development applications, illuminates a new path for advancing the state-of-the-art in testing automation.  
 
-![5 AGENT Pet Clinic Introduction](/docs/images/5agent-intro.gif)
+![5 AGENT Pet Clinic Introduction](docs/images/5agent-intro.gif)
 
 ### Quickstart Guide
 
