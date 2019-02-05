@@ -84,15 +84,24 @@ class FlowExecutor:
 
         observations = self.observer.perceive(act_state, page_analysis)
 
-        actual_observation_hashes = [hash(obs) for obs in observations]
+        actual_observation_hashes = [hash(str(obs)) for obs in observations]
 
         flow = concrete_flow.original_flow
 
         for i in range(len(flow.observe.observations)):
             expected_observation = flow.observe.observations[i]
-            expected_hash = hash(expected_observation)
+            expected_hash = hash(str(expected_observation))
+
             success = expected_observation.observe and expected_hash in actual_observation_hashes
-            success = success or not expected_observation.observe and expected_hash not in actual_observation_hashes
+
+            negative = False
+            if not expected_observation.observe:
+                negative = True
+                expected_observation.observe = True
+                expected_hash = hash(str(expected_observation))
+
+            success = success or (negative and expected_hash not in actual_observation_hashes)
+
             if not success:
                 LOGGER.info("Found defect on state: " + str(act_state.hash))
                 self.defect_rep.add_defect(flow, concrete_flow.bound_actions, i)

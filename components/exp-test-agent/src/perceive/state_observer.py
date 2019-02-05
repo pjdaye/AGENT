@@ -32,9 +32,9 @@ class StateObserver:
         label_candidates = page_analysis['analysis']['labelCandidates']
         error_messages = page_analysis['analysis']['errorMessages']
 
-        for widget in abstract_state.widgets:
-            widget_label = widget['label']
-            widget_label_key = widget['label_key']
+        for widget in abstract_state.get_all_widgets():
+            widget_label = widget['label'] if 'label' in widget else None
+            widget_label_key = widget['label_key'] if 'label_key' in widget else None
 
             if not widget_label:
                 continue
@@ -49,7 +49,10 @@ class StateObserver:
 
             widget_ident = widget_label.replace(' ', '').upper()
 
-            widget_component = Component(widget_element_class, widget_ident)
+            if isinstance(widget_element_class, ErrorMessage):
+                widget_component = Component(widget_element_class, None)
+            else:
+                widget_component = Component(widget_element_class, widget_ident)
 
             widget_observation = Observation().positive().with_component(widget_component)
 
