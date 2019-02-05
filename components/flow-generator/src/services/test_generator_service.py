@@ -20,7 +20,7 @@ class TestGeneratorService:
         """ Initializes the TestGeneratorService class.
         """
 
-        with open(f'{BASE_PATH}/embedding.json') as f:
+        with open("{}/embedding.json".format(BASE_PATH)) as f:
             data = json.load(f)
             self.char_indices = data['char_indices']
             self.indices_char = data['indices_char']
@@ -28,7 +28,7 @@ class TestGeneratorService:
         self.maxlen = 11
         self.chars = self.char_indices.values()
 
-        self.model = load_model(f'{BASE_PATH}/lstm.h5')
+        self.model = load_model("{}/lstm.h5".format(BASE_PATH))
 
         # noinspection PyProtectedMember
         self.model._make_predict_function()
