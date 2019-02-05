@@ -9,7 +9,7 @@ from inbound_tasks import coordinator_handle_planned_flow
 @patch('inbound_tasks.LOGGER')
 def test_coordinator_handle_planned_flow_with_planned_hash_in_processed_tests(logger_mock,
                                                                               jsonpickle_mock
-):
+                                                                              ):
     # Arrange
     flow_data = Mock()
     planned_flow_mock = Mock()
@@ -31,10 +31,10 @@ def test_coordinator_handle_planned_flow_with_planned_hash_in_processed_tests(lo
 @patch('inbound_tasks.processed_tests', {''})
 @patch('inbound_tasks.jsonpickle')
 @patch('inbound_tasks.LOGGER')
-def test_coordinator_handle_planned_flow_with_planned_hash_in_processed_tests(logger_mock,
-                                                                              jsonpickle_mock,
-                                                                              agent_flow_publisher_mock
-):
+def test_coordinator_handle_planned_flow_with_planned_hash_not_in_processed_tests(logger_mock,
+                                                                                  jsonpickle_mock,
+                                                                                  agent_flow_publisher_mock
+                                                                                  ):
     # Arrange
     flow_data = Mock()
     planned_flow_mock = Mock()
@@ -51,6 +51,6 @@ def test_coordinator_handle_planned_flow_with_planned_hash_in_processed_tests(lo
                                          '(planned_flow_mock_hash) planned_flow_mock_original_flow. (NEW)')
     logger_mock.info.assert_called_with('Received abstract test. Publishing to round-robin WORKER QUEUE.')
     agent_flow_publisher_mock.publish.assert_called_with(flow_data)
-    assert '' in  inbound_tasks.processed_tests
+    assert '' in inbound_tasks.processed_tests
     assert 'planned_flow_mock_hash' in inbound_tasks.processed_tests
     assert result is True

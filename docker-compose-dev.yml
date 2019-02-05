@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   coordinator-agent:
-    image: aista/coordinator-agent
+    build: ./components/coordinator-agent
     environment:
       - RABBITMQ_HOST=guest:guest@rabbitmq:5672
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
@@ -10,7 +10,7 @@ services:
         condition: service_healthy
 
   page-analyzer:
-    image: aista/page-analyzer
+    build: ./components/page-analyzer
     environment:
       - SERVICE_PORT=9000
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
@@ -20,7 +20,7 @@ services:
       - ./components/page-analyzer/src/data:/app/src/data
 
   form-expert:
-    image: aista/agent-form-expert
+    build: ./components/form-expert
     environment:
       - SERVICE_PORT=9003
       - FORM_EXPERT_MONGO_URI=mongodb://mongo:27017
@@ -36,7 +36,7 @@ services:
       - mongo
 
   seeding:
-    image: aista/form-expert-seeder
+    build: ./seeding
     environment:
       - FORM_EXPERT_URL=http://form-expert:9003
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
@@ -45,7 +45,7 @@ services:
         condition: service_healthy
 
   flow-generator:
-    image: aista/flow-generator
+    build: ./components/flow-generator
     environment:
       - SERVICE_PORT=9001
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
@@ -60,7 +60,7 @@ services:
       driver: none
 
   gateway:
-    image: aista/gateway
+    build: ./components/gateway
     environment:
       - SERVICE_PORT=9002
       - RABBITMQ_HOST=guest:guest@rabbitmq:5672
@@ -69,7 +69,7 @@ services:
       - "9002:9002"
 
   flower:
-    image: aista/agent-flower
+    build: ./deployment/flower
     environment:
       - RABBITMQ_HOST=guest:guest@rabbitmq:5672
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
@@ -102,11 +102,11 @@ services:
     logging:
       driver: none
 
-  exp-test-agent-1:
-    image: aista/exp-test-agent
+  exp-test-agent:
+    build: ./components/exp-test-agent
     environment:
       - RABBITMQ_HOST=guest:guest@rabbitmq:5672
-      - RUNNER_URL=http://aeon-runner-1:8080
+      - RUNNER_URL=http://aeon-runner:8080
       - PAGE_ANALYSIS_URL=http://page-analyzer:9000
       - FLOW_GENERATION_URL=http://flow-generator:9001
       - FORM_EXPERT_URL=http://form-expert:9003
@@ -115,79 +115,7 @@ services:
       rabbitmq:
         condition: service_healthy
 
-  exp-test-agent-2:
-    image: aista/exp-test-agent
-    environment:
-      - RABBITMQ_HOST=guest:guest@rabbitmq:5672
-      - RUNNER_URL=http://aeon-runner-2:8080
-      - PAGE_ANALYSIS_URL=http://page-analyzer:9000
-      - FLOW_GENERATION_URL=http://flow-generator:9001
-      - FORM_EXPERT_URL=http://form-expert:9003
-      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-
-  exp-test-agent-3:
-    image: aista/exp-test-agent
-    environment:
-      - RABBITMQ_HOST=guest:guest@rabbitmq:5672
-      - RUNNER_URL=http://aeon-runner-3:8080
-      - PAGE_ANALYSIS_URL=http://page-analyzer:9000
-      - FLOW_GENERATION_URL=http://flow-generator:9001
-      - FORM_EXPERT_URL=http://form-expert:9003
-      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-
-  exp-test-agent-4:
-    image: aista/exp-test-agent
-    environment:
-      - RABBITMQ_HOST=guest:guest@rabbitmq:5672
-      - RUNNER_URL=http://aeon-runner-4:8080
-      - PAGE_ANALYSIS_URL=http://page-analyzer:9000
-      - FLOW_GENERATION_URL=http://flow-generator:9001
-      - FORM_EXPERT_URL=http://form-expert:9003
-      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-
-  exp-test-agent-5:
-    image: aista/exp-test-agent
-    environment:
-      - RABBITMQ_HOST=guest:guest@rabbitmq:5672
-      - RUNNER_URL=http://aeon-runner-5:8080
-      - PAGE_ANALYSIS_URL=http://page-analyzer:9000
-      - FLOW_GENERATION_URL=http://flow-generator:9001
-      - FORM_EXPERT_URL=http://form-expert:9003
-      - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-
-  aeon-runner-1:
+  aeon-runner:
     image: aista/aeon-runner
     ports:
       - "8001:8080"
-
-  aeon-runner-2:
-    image: aista/aeon-runner
-    ports:
-      - "8002:8080"
-
-  aeon-runner-3:
-    image: aista/aeon-runner
-    ports:
-      - "8003:8080"
-
-  aeon-runner-4:
-    image: aista/aeon-runner
-    ports:
-      - "8004:8080"
-
-  aeon-runner-5:
-    image: aista/aeon-runner
-    ports:
-      - "8005:8080"

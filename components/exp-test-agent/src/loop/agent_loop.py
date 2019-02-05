@@ -27,7 +27,7 @@ class AgentLoop:
     """ Responsible for implementing the core control flow of the agent.
         Observes the SUT environment, plans, and acts upon the environment."""
 
-    NUM_ITERATIONS = 1000
+    NUM_ITERATIONS = 300
 
     def __init__(self, sut_url, runner_url, form_expert_client=None, runner_client=None,
                  page_analysis_client=None, flow_generator_client=None, flow_publisher=None, flow_executor=None):
@@ -208,7 +208,7 @@ class AgentLoop:
 
             LOGGER.debug("No abstract tests on WORKER QUEUE. Executing first available abstract test.")
 
-            is_ok = self.flow_executer.execute(abstract_state, self.runner, test_flow_queue[0])
+            is_ok = self.flow_executer.execute(abstract_state, self.runner, random.choice(test_flow_queue))
 
             if not is_ok:
                 raise Exception("Unable to execute flow step.")

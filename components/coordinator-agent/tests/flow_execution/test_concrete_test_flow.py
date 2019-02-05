@@ -1,17 +1,20 @@
 from unittest.mock import patch, Mock
 
-from abstraction.actionable_state import ActionableState
 from aist_common.grammar.test_flow import TestFlow
 
 from flow_execution.concrete_test_flow import ConcreteTestFlow
+
+
+class ActionableStateStub:
+    def __init__(self):
+        self.hash = 'abstract_state_hash'
 
 
 @patch(ConcreteTestFlow.__module__ + '.hash')
 @patch(ConcreteTestFlow.__module__ + '.frozenset')
 def test_calculate_hash(frozenset_mock, hash_mock):
     # Arrange
-    abstract_state = ActionableState()
-    abstract_state.hash = 'abstract_state_hash'
+    abstract_state = ActionableStateStub()
     bound_actions = [
         ['bound_action_1', {'key': 'key_1'}],
         ['bound_action_2', {'key': 'key_2'}]

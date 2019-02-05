@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   coordinator-agent:
-    build: ./components/coordinator-agent
+    image: aista/coordinator-agent
     environment:
       - RABBITMQ_HOST=guest:guest@rabbitmq:5672
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
@@ -10,7 +10,7 @@ services:
         condition: service_healthy
 
   page-analyzer:
-    build: ./components/page-analyzer
+    image: aista/page-analyzer
     environment:
       - SERVICE_PORT=9000
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
@@ -20,7 +20,7 @@ services:
       - ./components/page-analyzer/src/data:/app/src/data
 
   form-expert:
-    build: ./components/form-expert
+    image: aista/agent-form-expert
     environment:
       - SERVICE_PORT=9003
       - FORM_EXPERT_MONGO_URI=mongodb://mongo:27017
@@ -36,7 +36,7 @@ services:
       - mongo
 
   seeding:
-    build: ./seeding
+    image: aista/form-expert-seeder
     environment:
       - FORM_EXPERT_URL=http://form-expert:9003
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
@@ -45,7 +45,7 @@ services:
         condition: service_healthy
 
   flow-generator:
-    build: ./components/flow-generator
+    image: aista/flow-generator
     environment:
       - SERVICE_PORT=9001
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
@@ -60,7 +60,7 @@ services:
       driver: none
 
   gateway:
-    build: ./components/gateway
+    image: aista/gateway
     environment:
       - SERVICE_PORT=9002
       - RABBITMQ_HOST=guest:guest@rabbitmq:5672
@@ -69,7 +69,7 @@ services:
       - "9002:9002"
 
   flower:
-    build: ./deployment/flower
+    image: aista/agent-flower
     environment:
       - RABBITMQ_HOST=guest:guest@rabbitmq:5672
       - LOGGING_LEVEL=20 # this is standard Python logging mapping, 20 = INFO
@@ -103,7 +103,7 @@ services:
       driver: none
 
   exp-test-agent:
-    build: ./components/exp-test-agent
+    image: aista/exp-test-agent
     environment:
       - RABBITMQ_HOST=guest:guest@rabbitmq:5672
       - RUNNER_URL=http://aeon-runner:8080

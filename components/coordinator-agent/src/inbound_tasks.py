@@ -29,6 +29,9 @@ def coordinator_handle_planned_flow(flow_data):
 
     msg = "Received abstract test on COORDINATOR QUEUE:"
 
+    if len(processed_tests) > 150:
+        processed_tests.clear()
+
     if planned_hash in processed_tests:
         LOGGER.debug(f'{msg} ({str(planned_hash)}) {str(planned_flow.original_flow)}. (DUPLICATE)')
     else:

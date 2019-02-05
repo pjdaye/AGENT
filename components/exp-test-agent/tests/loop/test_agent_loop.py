@@ -1,6 +1,6 @@
 from abstraction.actionable_state import ActionableState
 from loop.agent_loop import AgentLoop
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 
 
 @patch(AgentLoop.__module__ + '.threading.Thread')
