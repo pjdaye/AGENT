@@ -8,16 +8,22 @@ from aist_common.log import get_logger
 
 LOGGER = get_logger('agent-coordinator')
 
-LOGGER.info("Starting agent...")
+def main():
 
-app = create_app(['inbound_tasks', 'outbound_tasks'])
+    LOGGER.info("Starting agent...")
 
-worker = celery.worker.WorkController(app=app,
-                                      hostname="test-coordinator",
-                                      pool_cls='solo',
-                                      queues=['test_coordinator_queue'])
+    app = create_app(['inbound_tasks', 'outbound_tasks'])
 
-threading.Thread(target=worker.start).start()
+    worker = celery.worker.WorkController(app=app,
+                                          hostname="test-coordinator",
+                                          pool_cls='solo',
+                                          queues=['test_coordinator_queue'])
 
-LOGGER.info("Celery started.")
-LOGGER.info("Agent started.")
+    threading.Thread(target=worker.start).start()
+
+    LOGGER.info("Celery started.")
+    LOGGER.info("Agent started.")
+
+
+if __name__ == '__main__':
+    main()
