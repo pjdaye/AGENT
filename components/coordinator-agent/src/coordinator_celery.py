@@ -8,6 +8,7 @@ from aist_common.log import get_logger
 
 LOGGER = get_logger('agent-coordinator')
 
+
 def main():
 
     LOGGER.info("Starting agent...")
