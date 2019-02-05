@@ -32,6 +32,8 @@ The extension additionally provides a mechanism for interactively labeling train
 
 ## Architecture
 
+![AGENT Architecture](images/agent_architecture.png)
+
 ## Pet Clinic
 
 PetClinic demonstrates the use of a Spring Boot with Spring MVC and Spring Data. While the testing of Spring functionality is not the purpose of this project, the PetClinic has an old history on the web and is well established within the community. In addition, the PetClinic application supports the primary form and action features the Agent is intended to explore and test. The PetClinic implements the following use cases:  
