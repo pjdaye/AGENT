@@ -76,13 +76,13 @@ Justin Phillips
 Philip Daye  
 Keith Briggs  
 Nicolette Celli  
-Peter J. Clarke
+Peter J. Clarke  
 Tariq King  
 
-Acknowledgements:
-Robert Vanderwall
-Michael Mattera
-Brian Muras
+Acknowledgements:  
+Robert Vanderwall  
+Michael Mattera  
+Brian Muras  
 
 ## References
 
