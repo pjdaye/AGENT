@@ -40,5 +40,15 @@ def test_calculate_hash(frozenset_mock, hash_mock):
 
     # Assert
     assert concrete_test_flow.hash == hash_mock_return_value
-    frozenset_mock.assert_called_with('test')
+    frozenset_mock.assert_called_with(
+        (
+            'abstract_state_hash',
+            'bound_action_1',
+            'key_1',
+            'bound_action_2',
+            'key_2',
+            'observe_step_1',
+            'observe_step_2'
+        )
+    )
     hash_mock.assert_called_with(frozenset_mock_return_value)
