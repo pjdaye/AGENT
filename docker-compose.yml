@@ -31,7 +31,7 @@ services:
       test: curl --fail -s http://localhost:9003/api/v1/health_check || exit 1
       interval: 5s
       timeout: 5s
-      retries: 3
+      retries: 10
     depends_on:
       - mongo
 
@@ -87,7 +87,7 @@ services:
     healthcheck:
       timeout: 5s
       interval: 5s
-      retries: 10
+      retries: 15
       test:
         - "CMD"
         - "rabbitmqctl"
