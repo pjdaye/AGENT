@@ -1,12 +1,12 @@
 import unittest
 
-from grammar.sequence_parser import SequenceParser
+from aist_common.grammar.sequence_parser import SequenceParser
 
 
 class GrammarTests(unittest.TestCase):
 
     def setUp(self):
-        self.parser = SequenceParser("../grammar/seq.g")
+        self.parser = SequenceParser()
 
     def test_flow_reconstruction(self):
         # Arrange.
@@ -131,14 +131,3 @@ class GrammarTests(unittest.TestCase):
 
         # Assert.
         self.assertEqual(to_parse, str(test_flow))
-
-    def test_flow_sequences(self):
-        with open('strings.txt', 'r') as file:
-            lines = file.readlines()
-        for line in lines:
-            line = line.strip()
-            if line.startswith('#') or line == "":
-                continue
-            print(line)
-            test_flow = self.parser.parse(line)
-            self.assertEqual(line, str(test_flow))
