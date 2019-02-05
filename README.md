@@ -57,6 +57,10 @@ AGENT will automatically stop after 300 iterations. However, if you would like t
 
 Set the POST body type to JSON, and the body data to an empty JSON object, `{}`. The header Content-Type should be set to application/json.
 
+## Architecture
+
+![AGENT Architecture](docs/images/agent_architecture.png)
+
 ## Additional Documentation
 
 * [Developer Install](docs/developer_install.md)
@@ -73,7 +77,7 @@ Philip Daye
 Keith Briggs
 Nicolette Celli
 Tariq King
-Peter Clarke
+Peter J. Clarke
 
 Acknowledgements:
 Robert Vanderwall
