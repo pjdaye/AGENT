@@ -30,6 +30,20 @@ class ActionableState:
 
         self.static_widgets.append(widget)
 
+    def get_all_widgets(self):
+        """Gets both actionable and static widgets.
+
+        :return: The widget list.
+        """
+
+        all_widgets = []
+        for widget in self.widgets:
+            all_widgets.append(widget)
+        for widget in self.static_widgets:
+            all_widgets.append(widget)
+
+        return all_widgets
+
     def find_widget_with_label(self, label, action):
         """Locates a widget with the requested label and action in the state.
 

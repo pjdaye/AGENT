@@ -107,6 +107,9 @@ class RunnerClient:
                 self.session.execute_command('SetCommand', [css, "Text", value])
             elif action.upper() == 'CLICK':
                 self.session.execute_command('ClickCommand', [css, "Text", value])
+            else:
+                LOGGER.error(f'Unknown action: {action}')
+                return False
 
             LOGGER.info(f'Successfully performed action: {action} {selector} {value}')
             return True
