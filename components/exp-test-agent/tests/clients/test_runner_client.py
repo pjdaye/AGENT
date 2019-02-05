@@ -160,7 +160,6 @@ def test_concrete_state_returns_false_when_get_document_location_script_fails(ru
     def command_side_effect(*args):
         if args[0] == 'ExecuteScriptCommand':
             return {'success': False, 'failureMessage': 'message'}
-        return {'success': True}
 
     runner_client.session.execute_command.side_effect = command_side_effect
 

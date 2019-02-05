@@ -72,7 +72,7 @@ def fill_form(forms, form):
                 new_form[form['form'][label]['id']] = neighbor['form'][label]['value']
             else:
                 unfilled_labels.append(label)
-        LOGGER.info('unfilled', unfilled_labels)
+        # LOGGER.info('unfilled', unfilled_labels)
         if len(labels) == len(unfilled_labels):
             for label in unfilled_labels:
                 new_form[form['form'][label]['id']] = None
