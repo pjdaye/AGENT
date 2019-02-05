@@ -37,6 +37,7 @@ def test_runner_client_launch_returns_false_on_failed_navigation(runner_client):
     # Assert
     assert result is False
 
+
 @patch(RunnerClient.__module__ + '.LOGGER')
 def test_runner_client_launch_returns_false_on_aeon_session_error_from_navigate_call(_, runner_client):
     # Arrange
@@ -95,6 +96,7 @@ def test_perform_click_action_returns_true_on_success(runner_client):
 
     # Assert
     assert result is True
+
 
 def test_perform_set_action_executes_set_command(runner_client):
     # Arrange
@@ -172,7 +174,7 @@ def test_concrete_state_returns_false_when_get_document_location_script_fails(ru
 def test_concrete_state_returns_empty_concrete_state_when_page_is_xml(runner_client):
     # Arrange
     def command_side_effect(*_):
-        response  = {
+        response = {
             'success': True,
             'data': 'document.xml'
         }
