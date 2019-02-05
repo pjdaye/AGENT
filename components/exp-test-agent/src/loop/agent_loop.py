@@ -180,7 +180,7 @@ class AgentLoop:
             for planned_flow in test_flow_queue:
                 self.flow_publish.publish(planned_flow)
 
-        """ Consume any concrete test flows that have been put on our 
+        """ Consume a concrete test flows that has been put on our 
             Celery-based worker queue by the Coordinator Agent. """
 
         memory_lock.acquire()
